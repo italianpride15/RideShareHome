@@ -5,58 +5,113 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 
-public class MainActivity extends ActionBarActivity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.*;
 
-    private static String kUberAppName = "com.ubercab";
-    private static String kLyftAppName;
-    private static String kSideCarAppName;
-    private static String kTaxiAppName;
+import com.google.android.gms.location.LocationServices;
 
-    private static String kUberDeepLinkQuery = "uber://?action=setPickup&pickup=my_location&dropoff[formatted_address]=";
-    private static String kLyftDeepLinkQuery;
-    private static String kSideCarDeepLinkQuery;
-    private static String kTaxiDeepLinkQuery;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
-    private String[] appName;
-    private String[] appQueryLink;
+public class MainActivity extends ActionBarActivity implements
+        ConnectionCallbacks, OnConnectionFailedListener{
 
+    //region VARIABLES
     private String homeAddress;
-    private String currentLocation;
 
+    private String currentLatitude;
+    private String currentLongitude;
+    private String currentCity;
+
+    private RideModel[] rideModels;
+    GoogleApiClient mGoogleApiClient;
+    //endregion
+
+    //region Life Cycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getHomeAddress();
         makeGoogleMapsRequest();
-        if (appIsAvailableInMyLocation(currentLocation)) {
+        if (appIsAvailableInMyLocation(currentCity)) {
             getPricesFromAvailableServices();
         }
     }
+    //endregion
 
+    //region Location Callbacks
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            currentLatitude = String.valueOf(mLastLocation.getLatitude());
+            currentLongitude = String.valueOf(mLastLocation.getLongitude());
+        }
+        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+            if (addresses.size() > 0)
+                currentCity = addresses.get(0).getLocality();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onConnectionSuspended(int i) {
+        return;
+    }
+
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        new AlertDialog.Builder(this)
+                .setTitle("Location Error!")
+                .setMessage("Could not retrieve location. Please check connection and relaunch app")
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+    //endregion
+
+    //region Touch Events
     /* Image Button onClick call to deeplink to specific apps */
-    public void deepLinkToApp1(View view) {
-        String appExists;
-        Uri appQuery;
+    public void deepLinkToApp(View view) {
         Integer index = Integer.parseInt(view.getTag().toString());
 
-        if (index >= 0 && index < appQueryLink.length -1) {
-            appExists = appName[index];
-            appQuery = Uri.parse(appQueryLink[index]);
+        if (index >= 0 && index < rideModels.length -1) {
 
             Context context = getApplicationContext();
             PackageManager pm = context.getPackageManager();
             try
             {
-
-                pm.getPackageInfo(appExists, PackageManager.GET_ACTIVITIES);
+                pm.getPackageInfo(rideModels[index].deepLinkAppName, PackageManager.GET_ACTIVITIES);
                 // The app is installed! Launch App.
-                Intent intent = new Intent(Intent.ACTION_VIEW, appQuery);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(rideModels[index].deepLinkQuery));
                 context.startActivity(intent);
 
             }
@@ -76,11 +131,15 @@ public class MainActivity extends ActionBarActivity {
             }
         }
     }
+    //endregion
+
+    //region Helper Methods
+    private void getHomeAddress() {
+
+    }
 
     private void makeGoogleMapsRequest() {
-        //get home address
-
-        //get current location
+        buildGoogleApiClient();
     }
 
     private Boolean appIsAvailableInMyLocation(String location) {
@@ -92,11 +151,11 @@ public class MainActivity extends ActionBarActivity {
 
     private void getPricesFromAvailableServices() {
 
-        appName = new String[4];
-        appQueryLink = new String[4];
+        rideModels = new RideModel[4];
 
         //make api calls
 
         //add update arrays by price
     }
+    //endregion
 }
