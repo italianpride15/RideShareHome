@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -31,10 +32,19 @@ public class MainActivity extends ActionBarActivity implements
 
     private String currentLatitude;
     private String currentLongitude;
-    private String currentCity;
 
     private RideModel[] rideModels;
+    Context context;
     GoogleApiClient mGoogleApiClient;
+    //endregion
+
+    //region Lazy Loaded Variables
+    public Context getContext() {
+        if (context == null) {
+            context = getApplicationContext();
+        }
+        return context;
+    }
     //endregion
 
     //region Life Cycle
@@ -43,30 +53,31 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getHomeAddress();
         makeGoogleMapsRequest();
-        if (appIsAvailableInMyLocation(currentCity)) {
-            getPricesFromAvailableServices();
-        }
+        retrieveHomeAddress();
     }
     //endregion
 
     //region Location Callbacks
     @Override
     public void onConnected(Bundle connectionHint) {
+        //get last location
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
             currentLatitude = String.valueOf(mLastLocation.getLatitude());
             currentLongitude = String.valueOf(mLastLocation.getLongitude());
         }
-        Geocoder gcd = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+        //get current city from location and check if service is available in user's area
+        Geocoder gcd = new Geocoder(context, Locale.getDefault());
         List<Address> addresses = null;
         try {
             addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-            if (addresses.size() > 0)
-                currentCity = addresses.get(0).getLocality();
-
+            if (addresses.size() > 0) {
+                String currentCity = addresses.get(0).getLocality();
+                proceedIfServiceIsAvailable(currentCity);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,16 +88,7 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        new AlertDialog.Builder(this)
-                .setTitle("Location Error!")
-                .setMessage("Could not retrieve location. Please check connection and relaunch app")
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        showAlertDialog("Location Error!", "Could not retrieve location. Please check connection and relaunch app");
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -105,7 +107,6 @@ public class MainActivity extends ActionBarActivity implements
 
         if (index >= 0 && index < rideModels.length -1) {
 
-            Context context = getApplicationContext();
             PackageManager pm = context.getPackageManager();
             try
             {
@@ -118,44 +119,87 @@ public class MainActivity extends ActionBarActivity implements
             catch (PackageManager.NameNotFoundException e)
             {
                 // App not installed! Launch popup.
-                new AlertDialog.Builder(this)
-                        .setTitle("App Not Installed")
-                        .setMessage("Please install the app.")
-                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                showAlertDialog("App Not Installed", "Please install the app.");
             }
         }
     }
     //endregion
 
     //region Helper Methods
-    private void getHomeAddress() {
+    private void retrieveHomeAddress() {
 
+        SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        homeAddress = preferences.getString("homeAddress", null);
+
+        if (homeAddress == null) {
+            //get user's address
+        }
+    }
+
+    private void storeHomeAddress() {
+        if (homeAddress != null) {
+            SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("homeAddress", homeAddress);
+            editor.commit();
+        }
     }
 
     private void makeGoogleMapsRequest() {
         buildGoogleApiClient();
     }
 
-    private Boolean appIsAvailableInMyLocation(String location) {
-        Boolean isAvailable = true;
-        //make parse call with location
+    private void proceedIfServiceIsAvailable(String currentCity) {
+        ServiceAvailability services = new ServiceAvailability(); //replace with parse call
 
-        return isAvailable;
+        if (services.appServiceAvailable == true) {
+            getPricesFromAvailableServices(services);
+        } else {
+            showAlertDialog("Service Not Available", "Sorry, this app is not available in your city yet");
+        }
     }
 
-    private void getPricesFromAvailableServices() {
+    private void getPricesFromAvailableServices(ServiceAvailability services) {
 
-        rideModels = new RideModel[4];
+        rideModels = new RideModel[services.numberOfAvailableServices];
+        GoogleDirectionsAPI info = new GoogleDirectionsAPI(currentLatitude, currentLongitude, homeAddress);
 
-        //make api calls
+        int index = 0;
+        if (services.uberAvailable == true) {
+            RideModel uber = new RideModel(RideModel.RideShareType.UBER, info);
+            rideModels[index] = uber;
+            index++;
+        }
+        if (services.lyftAvailable == true) {
+            RideModel lyft = new RideModel(RideModel.RideShareType.LYFT, info);
+            rideModels[index] = lyft;
+            index++;
+        }
+        if (services.sidecarAvailable == true) {
+            RideModel sidecar = new RideModel(RideModel.RideShareType.SIDECARE, info);
+            rideModels[index] = sidecar;
+            index++;
+        }
+        if (services.taxiAvailable == true) {
+            RideModel taxi = new RideModel(RideModel.RideShareType.TAXI, info);
+            rideModels[index] = taxi;
+            index++;
+        }
+    }
 
-        //add update arrays by price
+    private void showAlertDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
     //endregion
+
+
 }

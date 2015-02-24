@@ -19,7 +19,7 @@ public class RideModel {
     public String estimatedCost;
     public String surgeRate;
 
-    RideModel(RideShareType type) {
+    RideModel(RideShareType type, GoogleDirectionsAPI info) {
         switch (type) {
             case UBER:
                 deepLinkAppName = "com.ubercab";
