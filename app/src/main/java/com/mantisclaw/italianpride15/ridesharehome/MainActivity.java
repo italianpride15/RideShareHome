@@ -28,12 +28,8 @@ public class MainActivity extends ActionBarActivity implements
         ConnectionCallbacks, OnConnectionFailedListener{
 
     //region VARIABLES
-    private String homeAddress;
-
-    private String currentLatitude;
-    private String currentLongitude;
-
-    private RideModel[] rideModels;
+    private UserModel user;
+    private BaseRideModel[] rideModels;
     Context context;
     GoogleApiClient mGoogleApiClient;
     //endregion
@@ -45,6 +41,13 @@ public class MainActivity extends ActionBarActivity implements
         }
         return context;
     }
+
+    public UserModel getUser() {
+        if (user == null) {
+            user = new UserModel();
+        }
+        return user;
+    }
     //endregion
 
     //region Life Cycle
@@ -55,6 +58,7 @@ public class MainActivity extends ActionBarActivity implements
 
         makeGoogleMapsRequest();
         retrieveHomeAddress();
+        proceedIfServiceIsAvailable(user.homeAddress);
     }
     //endregion
 
@@ -65,8 +69,8 @@ public class MainActivity extends ActionBarActivity implements
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            currentLatitude = String.valueOf(mLastLocation.getLatitude());
-            currentLongitude = String.valueOf(mLastLocation.getLongitude());
+            user.currentLatitude = String.valueOf(mLastLocation.getLatitude());
+            user.currentLongitude = String.valueOf(mLastLocation.getLongitude());
         }
 
         //get current city from location and check if service is available in user's area
@@ -126,27 +130,29 @@ public class MainActivity extends ActionBarActivity implements
     //endregion
 
     //region Helper Methods
+    private void makeGoogleMapsRequest() {
+        buildGoogleApiClient();
+    }
+
     private void retrieveHomeAddress() {
 
         SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-        homeAddress = preferences.getString("homeAddress", null);
+        user.homeAddress = preferences.getString("homeAddress", null);
 
-        if (homeAddress == null) {
+        if (user.homeAddress == null) {
             //get user's address
+            //use google completion
+            storeHomeAddress();
         }
     }
 
     private void storeHomeAddress() {
-        if (homeAddress != null) {
+        if (user.homeAddress != null) {
             SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("homeAddress", homeAddress);
+            editor.putString("homeAddress", user.homeAddress);
             editor.commit();
         }
-    }
-
-    private void makeGoogleMapsRequest() {
-        buildGoogleApiClient();
     }
 
     private void proceedIfServiceIsAvailable(String currentCity) {
@@ -161,29 +167,34 @@ public class MainActivity extends ActionBarActivity implements
 
     private void getPricesFromAvailableServices(ServiceAvailability services) {
 
-        rideModels = new RideModel[services.numberOfAvailableServices];
-        GoogleDirectionsAPI info = new GoogleDirectionsAPI(currentLatitude, currentLongitude, homeAddress);
+        rideModels = new BaseRideModel[services.numberOfAvailableServices];
+        GoogleDirectionsAPI info = new GoogleDirectionsAPI(user);
 
-        int index = 0;
+        Integer index = 0;
         if (services.uberAvailable == true) {
-            RideModel uber = new RideModel(RideModel.RideShareType.UBER, info);
+            UberRideModel uber = new UberRideModel(user);
             rideModels[index] = uber;
             index++;
         }
         if (services.lyftAvailable == true) {
-            RideModel lyft = new RideModel(RideModel.RideShareType.LYFT, info);
+            LyftRideModel lyft = new LyftRideModel(user);
             rideModels[index] = lyft;
             index++;
         }
         if (services.sidecarAvailable == true) {
-            RideModel sidecar = new RideModel(RideModel.RideShareType.SIDECARE, info);
+            SidecarRideModel sidecar = new SidecarRideModel(user);
             rideModels[index] = sidecar;
             index++;
         }
         if (services.taxiAvailable == true) {
-            RideModel taxi = new RideModel(RideModel.RideShareType.TAXI, info);
+            TaxiRideModel taxi = new TaxiRideModel(user);
             rideModels[index] = taxi;
             index++;
+        }
+
+        //make API calls and update models with response info
+        for (BaseRideModel rideModel : rideModels) {
+            HttpUrlConnection.makeAPICall(rideModel);
         }
     }
 
@@ -200,6 +211,4 @@ public class MainActivity extends ActionBarActivity implements
                 .show();
     }
     //endregion
-
-
 }

@@ -9,7 +9,7 @@ public class ServiceAvailability {
     public Boolean lyftAvailable;
     public Boolean sidecarAvailable;
     public Boolean taxiAvailable;
-    public int numberOfAvailableServices;
+    public Integer numberOfAvailableServices;
 
     public ServiceAvailability() {
         numberOfAvailableServices = 4;

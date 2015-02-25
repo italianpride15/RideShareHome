@@ -16,12 +16,12 @@ import java.net.URL;
  * Created by italianpride15 on 2/23/15.
  */
 public class GoogleDirectionsAPI {
-    int distance;
-    int duration;
+    Double distance;
+    Double duration;
 
-    public GoogleDirectionsAPI(String currentLatitude, String currentLongitude, String homeAddress) {
+    public GoogleDirectionsAPI(UserModel user) {
         try {
-            getDirections(currentLatitude, currentLongitude, homeAddress);
+            getDirections(user);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -29,51 +29,32 @@ public class GoogleDirectionsAPI {
         }
     }
 
-    private void getDirections(String currentLatitude, String currentLongitude, String homeAddress)
+    private void getDirections(UserModel user)
             throws IOException, JSONException {
 
         //build url string
         StringBuilder urlString = new StringBuilder();
         urlString.append("http://maps.googleapis.com/maps/api/directions/json?");
-        urlString.append("origin=");//from
-        urlString.append(currentLatitude);
+        urlString.append("origin=");
+        urlString.append(user.currentLatitude);
         urlString.append(",");
-        urlString.append(currentLongitude);
-        urlString.append("&destination=");//to
-        urlString.append(homeAddress);
+        urlString.append(user.currentLongitude);
+        urlString.append("&destination=");
+        urlString.append(user.homeAddress);
         urlString.append("&key=AIzaSyAtkemj4ZgNEX98GYK6v6cv2glJiDcyXAE");
 
-        // get the JSON And parse it to get the directions data.
-        URL url = new URL(urlString.toString());
-        HttpURLConnection urlConnection=(HttpURLConnection)url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.setDoOutput(true);
-        urlConnection.setDoInput(true);
-        urlConnection.connect();
+        //make request and get back json object
+        JSONObject object = HttpUrlConnection.makeNetworkRequest(urlString.toString(), null);
 
-        InputStream inStream = urlConnection.getInputStream();
-        BufferedReader bReader = new BufferedReader(new InputStreamReader(inStream));
-
-        String temp, response = "";
-        while((temp = bReader.readLine()) != null){
-            //Parse data
-            response += temp;
-        }
-        //Close the reader, stream & connection
-        bReader.close();
-        inStream.close();
-        urlConnection.disconnect();
-
-        //Sortout JSONresponse
-        JSONObject object = (JSONObject) new JSONTokener(response).nextValue();
+        //parse through json object
         JSONArray array = object.getJSONArray("routes");
         JSONObject routes = array.getJSONObject(0);
         JSONObject legs = routes.getJSONObject("legs");
 
-        JSONObject distance = legs.getJSONObject("distance");
-        JSONObject duration = legs.getJSONObject("duration");
+        user.homeLatitude = legs.getJSONObject("end_location").getString("lat");
+        user.homeLongitude = legs.getJSONObject("end_location").getString("lng");
 
-        this.distance = distance.getInt("value");
-        this.duration = duration.getInt("value");
+        this.distance = legs.getJSONObject("distance").getDouble("value");
+        this.duration = legs.getJSONObject("duration").getDouble("value");
     }
 }
