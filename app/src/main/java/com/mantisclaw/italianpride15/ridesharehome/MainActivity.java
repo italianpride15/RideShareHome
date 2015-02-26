@@ -19,6 +19,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.*;
 
 import com.google.android.gms.location.LocationServices;
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,6 +60,10 @@ public class MainActivity extends ActionBarActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Enable Local Datastore.
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "Z6WVHg75MPlkEmPYDB8Oa5CED9Wukm7UyGi1w79s", "s5OF0qYXOgRelbps5ySIOBLeoG4GnrgL6BXprtQQ");
 
         makeGoogleMapsRequest();
         retrieveHomeAddress();
@@ -156,13 +165,22 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void proceedIfServiceIsAvailable(String currentCity) {
-        ServiceAvailability services = new ServiceAvailability(); //replace with parse call
-
-        if (services.appServiceAvailable == true) {
-            getPricesFromAvailableServices(services);
-        } else {
-            showAlertDialog("Service Not Available", "Sorry, this app is not available in your city yet");
-        }
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("CityRate");
+        query.whereEqualTo("City", "Chicago");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> rideShareList, ParseException e) {
+                if (e == null) {
+                    if (rideShareList.size() > 0) {
+                        ServiceAvailability services = new ServiceAvailability(rideShareList);
+                        getPricesFromAvailableServices(services);
+                    } else {
+                        showAlertDialog("Service Not Available", "Sorry, this app is not available in your city yet");
+                    }
+                } else {
+                    showAlertDialog("Network Error", "Could not retrieve available services.");
+                }
+            }
+        });
     }
 
     private void getPricesFromAvailableServices(ServiceAvailability services) {
@@ -171,30 +189,38 @@ public class MainActivity extends ActionBarActivity implements
         GoogleDirectionsAPI info = new GoogleDirectionsAPI(user);
 
         Integer index = 0;
-        if (services.uberAvailable == true) {
+        ParseObject object;
+
+        object = (ParseObject)services.rideShareDictionary.get("Uber");
+        if (object != null) {
             UberRideModel uber = new UberRideModel(user);
+            HttpUrlConnection.makeAPICall(uber, object, info);
             rideModels[index] = uber;
             index++;
         }
-        if (services.lyftAvailable == true) {
+
+        object = (ParseObject)services.rideShareDictionary.get("Lyft");
+        if (object != null) {
             LyftRideModel lyft = new LyftRideModel(user);
+            HttpUrlConnection.makeAPICall(lyft, object, info);
             rideModels[index] = lyft;
             index++;
         }
-        if (services.sidecarAvailable == true) {
+
+        object = (ParseObject)services.rideShareDictionary.get("Sidecar");
+        if (object != null) {
             SidecarRideModel sidecar = new SidecarRideModel(user);
+            HttpUrlConnection.makeAPICall(sidecar, object, info);
             rideModels[index] = sidecar;
             index++;
         }
-        if (services.taxiAvailable == true) {
+
+        object = (ParseObject)services.rideShareDictionary.get("Taxi");
+        if (object != null) {
             TaxiRideModel taxi = new TaxiRideModel(user);
+            HttpUrlConnection.makeAPICall(taxi, object, info);
             rideModels[index] = taxi;
             index++;
-        }
-
-        //make API calls and update models with response info
-        for (BaseRideModel rideModel : rideModels) {
-            HttpUrlConnection.makeAPICall(rideModel);
         }
     }
 
