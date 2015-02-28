@@ -8,6 +8,7 @@ public class UserModel {
     public String homeAddress;
     public String homeLatitude;
     public String homeLongitude;
+    public String startAddress;
     public String currentLatitude;
     public String currentLongitude;
 }

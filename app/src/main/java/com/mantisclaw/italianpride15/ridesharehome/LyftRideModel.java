@@ -13,6 +13,6 @@ public class LyftRideModel extends BaseRideModel {
 //    deepLinkAppName = "com.lyft";
 //    deepLinkQuery = "";
     public LyftRideModel(UserModel user) {
-
+        //fill in when API becomes available
     }
 }

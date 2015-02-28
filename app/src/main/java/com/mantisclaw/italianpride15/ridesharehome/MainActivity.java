@@ -33,6 +33,9 @@ public class MainActivity extends ActionBarActivity implements
         ConnectionCallbacks, OnConnectionFailedListener{
 
     //region VARIABLES
+    private static final String parse_application_id = "Z6WVHg75MPlkEmPYDB8Oa5CED9Wukm7UyGi1w79s";
+    private static final String parse_client_id = "s5OF0qYXOgRelbps5ySIOBLeoG4GnrgL6BXprtQQ";
+
     private UserModel user;
     private BaseRideModel[] rideModels;
     Context context;
@@ -63,11 +66,12 @@ public class MainActivity extends ActionBarActivity implements
 
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "Z6WVHg75MPlkEmPYDB8Oa5CED9Wukm7UyGi1w79s", "s5OF0qYXOgRelbps5ySIOBLeoG4GnrgL6BXprtQQ");
+        Parse.initialize(this, parse_application_id, parse_client_id);
 
         makeGoogleMapsRequest();
+        mGoogleApiClient.connect();
         retrieveHomeAddress();
-        proceedIfServiceIsAvailable(user.homeAddress);
+        //onConnect proceeds with execution
     }
     //endregion
 
@@ -78,12 +82,12 @@ public class MainActivity extends ActionBarActivity implements
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            user.currentLatitude = String.valueOf(mLastLocation.getLatitude());
-            user.currentLongitude = String.valueOf(mLastLocation.getLongitude());
+            getUser().currentLatitude = String.valueOf(mLastLocation.getLatitude());
+            getUser().currentLongitude = String.valueOf(mLastLocation.getLongitude());
         }
 
         //get current city from location and check if service is available in user's area
-        Geocoder gcd = new Geocoder(context, Locale.getDefault());
+        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
         List<Address> addresses = null;
         try {
             addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
@@ -120,13 +124,13 @@ public class MainActivity extends ActionBarActivity implements
 
         if (index >= 0 && index < rideModels.length -1) {
 
-            PackageManager pm = context.getPackageManager();
+            PackageManager pm = getContext().getPackageManager();
             try
             {
                 pm.getPackageInfo(rideModels[index].deepLinkAppName, PackageManager.GET_ACTIVITIES);
                 // The app is installed! Launch App.
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(rideModels[index].deepLinkQuery));
-                context.startActivity(intent);
+                getContext().startActivity(intent);
 
             }
             catch (PackageManager.NameNotFoundException e)
@@ -145,10 +149,13 @@ public class MainActivity extends ActionBarActivity implements
 
     private void retrieveHomeAddress() {
 
-        SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-        user.homeAddress = preferences.getString("homeAddress", null);
+        SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", getContext().MODE_PRIVATE);
+        getUser().homeAddress = preferences.getString("homeAddress", null);
 
-        if (user.homeAddress == null) {
+        if (getUser().homeAddress == null) {
+            getUser().homeAddress = "626W.Patterson,Chicago";
+            getUser().homeLatitude = "41.948756";
+            getUser().homeLongitude = "-87.647285";
             //get user's address
             //use google completion
             storeHomeAddress();
@@ -156,10 +163,12 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private void storeHomeAddress() {
-        if (user.homeAddress != null) {
-            SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        if (getUser().homeAddress != null) {
+            SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", getContext().MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("homeAddress", user.homeAddress);
+            editor.putString("homeAddress", getUser().homeAddress);
+            editor.putString("homeLatitude", getUser().homeLatitude);
+            editor.putString("homeLongitude", getUser().homeLongitude);
             editor.commit();
         }
     }
@@ -186,39 +195,39 @@ public class MainActivity extends ActionBarActivity implements
     private void getPricesFromAvailableServices(ServiceAvailability services) {
 
         rideModels = new BaseRideModel[services.numberOfAvailableServices];
-        GoogleDirectionsAPI info = new GoogleDirectionsAPI(user);
+        GoogleDirectionsAPI info = new GoogleDirectionsAPI(getUser());
 
         Integer index = 0;
         ParseObject object;
 
         object = (ParseObject)services.rideShareDictionary.get("Uber");
         if (object != null) {
-            UberRideModel uber = new UberRideModel(user);
-            HttpUrlConnection.makeAPICall(uber, object, info);
+            UberRideModel uber = new UberRideModel(getUser());
+            APIManager.makeAPICall(uber, object, info);
             rideModels[index] = uber;
             index++;
         }
 
         object = (ParseObject)services.rideShareDictionary.get("Lyft");
         if (object != null) {
-            LyftRideModel lyft = new LyftRideModel(user);
-            HttpUrlConnection.makeAPICall(lyft, object, info);
+            LyftRideModel lyft = new LyftRideModel(getUser());
+            APIManager.makeAPICall(lyft, object, info);
             rideModels[index] = lyft;
             index++;
         }
 
         object = (ParseObject)services.rideShareDictionary.get("Sidecar");
         if (object != null) {
-            SidecarRideModel sidecar = new SidecarRideModel(user);
-            HttpUrlConnection.makeAPICall(sidecar, object, info);
+            SidecarRideModel sidecar = new SidecarRideModel(getUser());
+            APIManager.makeAPICall(sidecar, object, info);
             rideModels[index] = sidecar;
             index++;
         }
 
         object = (ParseObject)services.rideShareDictionary.get("Taxi");
         if (object != null) {
-            TaxiRideModel taxi = new TaxiRideModel(user);
-            HttpUrlConnection.makeAPICall(taxi, object, info);
+            TaxiRideModel taxi = new TaxiRideModel(getUser());
+            APIManager.makeAPICall(taxi, object, info);
             rideModels[index] = taxi;
             index++;
         }

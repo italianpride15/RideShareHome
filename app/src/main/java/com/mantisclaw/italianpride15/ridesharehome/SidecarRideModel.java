@@ -8,6 +8,6 @@ public class SidecarRideModel extends BaseRideModel {
 //    deepLinkAppName = "com.sidecar";
 //    deepLinkQuery = "";
     public SidecarRideModel(UserModel user) {
-
+        //fill in when API becomes available
     }
 }
