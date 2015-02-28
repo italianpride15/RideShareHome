@@ -66,7 +66,7 @@ public class APIManager {
         if (fees > 0) {
             cost += fees;
         }
-        rideModel.estimatedCost = cost.toString();
+        rideModel.estimatedCost = String.format("%.2f", cost);
         //TODO: get surge rate for Lyft
     }
 

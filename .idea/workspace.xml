@@ -34,8 +34,8 @@
       <file leaf-file-name="MainActivity.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.5217392" vertical-offset="1563" max-vertical-offset="3300">
-              <caret line="230" column="22" selection-start-line="230" selection-start-column="22" selection-end-line="230" selection-end-column="22" />
+            <state vertical-scroll-proportion="0.33333334" vertical-offset="2910" max-vertical-offset="3315">
+              <caret line="235" column="0" selection-start-line="235" selection-start-column="0" selection-end-line="235" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -44,8 +44,18 @@
       <file leaf-file-name="Parse.class" pinned="false" current="false" current-in-tab="false">
         <entry file="jar://$PROJECT_DIR$/app/libs/Parse-1.8.2.jar!/com/parse/Parse.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.36" vertical-offset="266" max-vertical-offset="2355">
-              <caret line="31" column="23" selection-start-line="31" selection-start-column="23" selection-end-line="31" selection-end-column="23" />
+            <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="2355">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BaseRideModel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/BaseRideModel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="77" max-vertical-offset="405">
+              <caret line="16" column="27" selection-start-line="16" selection-start-column="27" selection-end-line="16" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -1271,18 +1281,18 @@
       <list>
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/RideModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/BaseAPI.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/BaseRideModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/UberRideModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/ServiceAvailability.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/UserModel.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/SidecarRideModel.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/LyftRideModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/TaxiRideModel.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/APIManager.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/HttpUrlConnection.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/GoogleDirectionsAPI.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/APIManager.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/LyftRideModel.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/SidecarRideModel.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/BaseRideModel.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/MainActivity.java" />
       </list>
     </option>
@@ -1318,9 +1328,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane" />
-      <pane id="Scope" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -1341,6 +1348,10 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="app" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="res" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidResFolderNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -1391,6 +1402,9 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="ProjectPane" />
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1602,21 +1616,21 @@
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288364" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39966273" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39966273" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39966273" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39966273" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21647818" sideWeight="0.5025295" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21647818" sideWeight="0.505618" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32715008" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288364" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288364" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21647818" sideWeight="0.49578413" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21647818" sideWeight="0.49438202" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Memory Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1645,7 +1659,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="52" />
+      <option name="time" value="61" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -1732,7 +1746,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="13125" max-vertical-offset="15390">
           <caret line="875" column="16" selection-start-line="875" selection-start-column="16" selection-end-line="875" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1845,13 +1858,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-12.0" vertical-offset="0" max-vertical-offset="555">
-          <caret line="20" column="9" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
@@ -1904,7 +1910,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.58231705" vertical-offset="3266" max-vertical-offset="9450">
           <caret line="232" column="0" selection-start-line="232" selection-start-column="0" selection-end-line="232" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1912,7 +1917,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.44512194" vertical-offset="13031" max-vertical-offset="14295">
           <caret line="924" column="16" selection-start-line="924" selection-start-column="16" selection-end-line="924" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1920,7 +1924,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-4.2" vertical-offset="4305" max-vertical-offset="6165">
           <caret line="295" column="18" selection-start-line="295" selection-start-column="18" selection-end-line="295" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1928,31 +1931,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.36206895" vertical-offset="1710" max-vertical-offset="4215">
           <caret line="122" column="25" selection-start-line="122" selection-start-column="25" selection-end-line="122" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Android/sdk/sources/android-21/com/android/internal/os/ZygoteInit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="11006" max-vertical-offset="13050">
-          <caret line="790" column="0" selection-start-line="790" selection-start-column="0" selection-end-line="790" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/APIManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="783" max-vertical-offset="1350">
-          <caret line="83" column="14" selection-start-line="80" selection-start-column="14" selection-end-line="83" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/BaseRideModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="315">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1960,15 +1938,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="390" max-vertical-offset="975">
           <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/LyftRideModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
-          <caret line="15" column="44" selection-start-line="15" selection-start-column="44" selection-end-line="15" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1988,22 +1957,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/TaxiRideModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.53097343" vertical-offset="0" max-vertical-offset="565">
-          <caret line="20" column="21" selection-start-line="20" selection-start-column="21" selection-end-line="20" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/SidecarRideModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.26548672" vertical-offset="0" max-vertical-offset="565">
-          <caret line="10" column="19" selection-start-line="10" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/UserModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.26548672" vertical-offset="0" max-vertical-offset="565">
@@ -2012,9 +1965,57 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/Library/Android/sdk/sources/android-21/com/android/internal/os/ZygoteInit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="10961" max-vertical-offset="13050">
+          <caret line="787" column="0" selection-start-line="787" selection-start-column="0" selection-end-line="787" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/APIManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="1350">
+          <caret line="68" column="35" selection-start-line="68" selection-start-column="35" selection-end-line="68" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
+          <caret line="20" column="9" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/LyftRideModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="32" max-vertical-offset="360">
+          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/SidecarRideModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5030488" vertical-offset="0" max-vertical-offset="328">
+          <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="11" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/TaxiRideModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.91463417" vertical-offset="0" max-vertical-offset="555">
+          <caret line="20" column="21" selection-start-line="20" selection-start-column="21" selection-end-line="20" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/UberRideModel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.097345136" vertical-offset="95" max-vertical-offset="660">
+        <state vertical-scroll-proportion="0.45731708" vertical-offset="0" max-vertical-offset="660">
           <caret line="10" column="37" selection-start-line="10" selection-start-column="37" selection-end-line="10" selection-end-column="37" />
           <folding />
         </state>
@@ -2022,16 +2023,24 @@
     </entry>
     <entry file="jar://$PROJECT_DIR$/app/libs/Parse-1.8.2.jar!/com/parse/Parse.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.36" vertical-offset="266" max-vertical-offset="2355">
-          <caret line="31" column="23" selection-start-line="31" selection-start-column="23" selection-end-line="31" selection-end-column="23" />
+        <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="2370">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/BaseRideModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="77" max-vertical-offset="405">
+          <caret line="16" column="27" selection-start-line="16" selection-start-column="27" selection-end-line="16" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/mantisclaw/italianpride15/ridesharehome/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.5217392" vertical-offset="1563" max-vertical-offset="3300">
-          <caret line="230" column="22" selection-start-line="230" selection-start-column="22" selection-end-line="230" selection-end-column="22" />
+        <state vertical-scroll-proportion="0.33333334" vertical-offset="2910" max-vertical-offset="3315">
+          <caret line="235" column="0" selection-start-line="235" selection-start-column="0" selection-end-line="235" selection-end-column="0" />
           <folding />
         </state>
       </provider>

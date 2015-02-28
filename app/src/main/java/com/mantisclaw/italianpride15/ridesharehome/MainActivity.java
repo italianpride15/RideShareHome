@@ -26,6 +26,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -194,7 +195,7 @@ public class MainActivity extends ActionBarActivity implements
 
     private void getPricesFromAvailableServices(ServiceAvailability services) {
 
-        rideModels = new BaseRideModel[services.numberOfAvailableServices];
+        rideModels = new BaseRideModel[services.numberOfAvailableServices-1];
         GoogleDirectionsAPI info = new GoogleDirectionsAPI(getUser());
 
         Integer index = 0;
@@ -224,13 +225,14 @@ public class MainActivity extends ActionBarActivity implements
             index++;
         }
 
-        object = (ParseObject)services.rideShareDictionary.get("Taxi");
-        if (object != null) {
-            TaxiRideModel taxi = new TaxiRideModel(getUser());
-            APIManager.makeAPICall(taxi, object, info);
-            rideModels[index] = taxi;
-            index++;
-        }
+//        object = (ParseObject)services.rideShareDictionary.get("Taxi");
+//        if (object != null) {
+//            TaxiRideModel taxi = new TaxiRideModel(getUser());
+//            APIManager.makeAPICall(taxi, object, info);
+//            rideModels[index] = taxi;
+//            index++;
+//        }
+        Arrays.sort(rideModels);
     }
 
     private void showAlertDialog(String title, String message) {
