@@ -1,5 +1,6 @@
 package com.mantisclaw.italianpride15.ridesharehome;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,13 +10,17 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,8 +43,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-public class MainActivity extends ActionBarActivity implements
-        ConnectionCallbacks, OnConnectionFailedListener{
+public class MainActivity extends Activity implements
+        ConnectionCallbacks, OnConnectionFailedListener, OnItemClickListener {
 
     //region VARIABLES
     //parse
@@ -88,6 +93,15 @@ public class MainActivity extends ActionBarActivity implements
         mGoogleApiClient.connect();
         retrieveHomeAddress();
         //onConnect proceeds with execution
+    }
+    //endregion
+
+    //region OnItemClickListener Callback
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        String str = (String) adapterView.getItemAtPosition(position);
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(adapterView.getWindowToken(), 0);
     }
     //endregion
 
@@ -336,6 +350,10 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     public void updateViewWithData() {
+        //setup autocomplete for home address
+        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
+        autoCompView.setAdapter(new PlacesAutoCompleteAdapter(getContext(), R.layout.list_item, getUser()));
+
         //update home address
         EditText homeAddress = (EditText) findViewById(R.id.HomeAddress);
         homeAddress.setText(getUser().homeAddress);
@@ -400,4 +418,6 @@ public class MainActivity extends ActionBarActivity implements
                 .show();
     }
     //endregion
+
+
 }
