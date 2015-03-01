@@ -5,9 +5,11 @@ package com.mantisclaw.italianpride15.ridesharehome;
  */
 public class SidecarRideModel extends BaseRideModel {
 
-//    deepLinkAppName = "com.sidecar";
-//    deepLinkQuery = "";
+    private static final String deepLink = "com.sidecarPassenger";
+
     public SidecarRideModel(UserModel user) {
+        drawableImageResource = "sidecar";
+        deepLinkAppName = deepLink;
         //fill in when API becomes available
     }
 }

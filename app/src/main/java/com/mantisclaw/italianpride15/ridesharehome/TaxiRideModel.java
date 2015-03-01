@@ -7,7 +7,7 @@ public class TaxiRideModel extends BaseRideModel {
 
     private static final String taxime_client_id = "";
     private static final String taxime_base_url = "http://www.taxime.com/api/1/estimate.json?";
-    private static final String deepLink = "com.taxime";
+    private static final String deepLink = "com.taxime.client";
     public String query;
 
     public TaxiRideModel(UserModel user) {
@@ -27,5 +27,7 @@ public class TaxiRideModel extends BaseRideModel {
         urlString.append(user.currentLongitude);
 
         query = urlString.toString();
+        drawableImageResource = "taxi";
+        deepLinkAppName = deepLink;
     }
 }

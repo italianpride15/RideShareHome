@@ -10,7 +10,7 @@ public class UberRideModel extends BaseRideModel {
     private static final String uber_server_token = "p4xGiso2Lt5slHGTHSg9fHRgJMT0OUmsn5ksrJw3";
     private static final String uber_base_url = "https://api.uber.com/v1/estimates/price?";
     private static final String deepLink = "com.ubercab";
-    private static final String query = "uber://?action=setPickup&pickup=my_location&dropoff[formatted_address]=";
+    private static final String query = "uber://?action=setPickup&pickup=my_location";//&dropoff[formatted_address]=";
 
     UberRideModel(UserModel user) {
         client_id = uber_client_id;
@@ -32,6 +32,7 @@ public class UberRideModel extends BaseRideModel {
         queryString.append(query);
         queryString.append(user.homeAddress);
         deepLinkQuery = queryString.toString() ;
+        drawableImageResource = "uber";
     }
 
     public static String getUber_server_token() {

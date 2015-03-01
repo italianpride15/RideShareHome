@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -61,11 +61,10 @@
         android:layout_height="100dp"
         android:id="@+id/rideShareImageButton2"
         android:scaleType="fitCenter"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="80dp"
         android:onClick="deepLinkToApp"
         android:tag="2"
+        android:layout_below="@+id/rideShareTextView1b"
         android:contentDescription="@string/accessibilityRideButton" />
 
     <TextView
@@ -91,11 +90,10 @@
         android:layout_height="100dp"
         android:id="@+id/rideShareImageButton3"
         android:scaleType="fitCenter"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="80dp"
         android:onClick="deepLinkToApp"
         android:tag="3"
+        android:layout_below="@+id/rideShareTextView1b"
         android:contentDescription="@string/accessibilityRideButton" />
 
     <TextView
@@ -123,11 +121,10 @@
         android:layout_height="100dp"
         android:id="@+id/rideShareImageButton4"
         android:scaleType="fitCenter"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="80dp"
         android:onClick="deepLinkToApp"
         android:tag="4"
+        android:layout_below="@+id/rideShareTextView1b"
         android:contentDescription="@string/accessibilityRideButton" />
 
     <TextView
@@ -136,6 +133,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
         android:text="@string/price"
+        android:layout_alignParentEnd="true"
         android:id="@+id/rideShareTextView4a"
         android:layout_below="@+id/rideShareImageButton4" />
 
@@ -145,6 +143,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
         android:text="@string/surge_rate"
+        android:layout_alignParentEnd="true"
         android:id="@+id/rideShareTextView4b"
         android:layout_below="@+id/rideShareTextView4a" />
 

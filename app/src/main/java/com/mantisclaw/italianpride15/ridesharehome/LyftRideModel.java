@@ -5,14 +5,11 @@ package com.mantisclaw.italianpride15.ridesharehome;
  */
 public class LyftRideModel extends BaseRideModel {
 
-    //                NSURL *lyftURL =[NSURL URLWithString:@"fb275560259205767://"];
-//                if ([[UIApplication sharedApplication] canOpenURL:lyftURL]) {
-//                [[UIApplication sharedApplication] openURL:lyftURL];
+    private static final String deepLink = "me.lyft.android";
 
-    //make parse call
-//    deepLinkAppName = "com.lyft";
-//    deepLinkQuery = "";
     public LyftRideModel(UserModel user) {
+        drawableImageResource = "lyft";
+        deepLinkAppName = deepLink;
         //fill in when API becomes available
     }
 }

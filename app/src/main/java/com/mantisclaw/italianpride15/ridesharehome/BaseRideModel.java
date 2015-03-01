@@ -5,11 +5,16 @@ package com.mantisclaw.italianpride15.ridesharehome;
  */
 public class BaseRideModel implements Comparable<BaseRideModel> {
 
+    //API variables
     public String client_id;
     public String requestURL;
     public String deepLinkAppName;
     public String deepLinkQuery;
 
+    //Resource ids
+    public String drawableImageResource;
+
+    //Cost variables
     public String estimatedCost;
     public String surgeRate;
 
