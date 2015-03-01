@@ -14,10 +14,9 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,8 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-public class MainActivity extends Activity implements
-        ConnectionCallbacks, OnConnectionFailedListener, OnItemClickListener {
+public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, OnItemClickListener {
 
     //region VARIABLES
     //parse
@@ -57,7 +55,7 @@ public class MainActivity extends Activity implements
     private static final String textViewResource = "rideShareTextView";
 
     //application objects
-    private UserModel user;
+    public static UserModel user;
     private BaseRideModel[] rideModels;
 
     //location
@@ -93,15 +91,6 @@ public class MainActivity extends Activity implements
         mGoogleApiClient.connect();
         retrieveHomeAddress();
         //onConnect proceeds with execution
-    }
-    //endregion
-
-    //region OnItemClickListener Callback
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        String str = (String) adapterView.getItemAtPosition(position);
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(adapterView.getWindowToken(), 0);
     }
     //endregion
 
@@ -353,10 +342,10 @@ public class MainActivity extends Activity implements
         //setup autocomplete for home address
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
         autoCompView.setAdapter(new PlacesAutoCompleteAdapter(getContext(), R.layout.list_item, getUser()));
+        autoCompView.setOnItemClickListener(this);
 
         //update home address
-        EditText homeAddress = (EditText) findViewById(R.id.HomeAddress);
-        homeAddress.setText(getUser().homeAddress);
+        autoCompView.setText(getUser().homeAddress);
 
         //update buttons
         Integer index = 1;
@@ -374,6 +363,13 @@ public class MainActivity extends Activity implements
             ride1surge.setText(model.surgeRate);
             index++;
         }
+    }
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        String str = (String) adapterView.getItemAtPosition(position);
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(autoCompView.getWindowToken(), 0);
     }
 
     private void initParse() {

@@ -2,10 +2,10 @@
     <string name="app_name">RideShareHome</string>
 
     <string name="main_title">Ride Share Home</string>
-    <string name="home_address">Home Address: </string>
+    <string name="home_address">Home Address</string>
     <string name="accessibilityRideButton">Ride share</string>
-    <string name="price">$</string>
-    <string name="surge_rate">Surge Rate: </string>
+    <string name="price">Cost</string>
+    <string name="surge_rate">Surge Rate</string>
 
     <string name="action_settings">Settings</string>
 </resources>

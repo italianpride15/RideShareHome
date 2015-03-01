@@ -16,11 +16,11 @@
         android:layout_centerHorizontal="true" />
 
     <AutoCompleteTextView
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_width="500dp"
+        android:layout_height="40dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textAlignment="center"
-        android:text="@string/home_address"
+        android:hint="@string/home_address"
         android:id="@+id/HomeAddress"
         android:layout_below="@+id/MainTitle"
         android:layout_centerHorizontal="true" />
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/price"
+        android:hint="@string/price"
         android:id="@+id/rideShareTextView1a"
         android:layout_below="@+id/rideShareImageButton1"
         android:layout_centerHorizontal="true" />
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/surge_rate"
+        android:hint="@string/surge_rate"
         android:id="@+id/rideShareTextView1b"
         android:layout_below="@+id/rideShareTextView1a"
         android:layout_centerHorizontal="true" />
@@ -72,7 +72,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/price"
+        android:hint="@string/price"
         android:id="@+id/rideShareTextView2a"
         android:layout_below="@+id/rideShareImageButton2" />
 
@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/surge_rate"
+        android:hint="@string/surge_rate"
         android:id="@+id/rideShareTextView2b"
         android:layout_below="@+id/rideShareTextView2a" />
 
@@ -101,7 +101,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/price"
+        android:hint="@string/price"
         android:id="@+id/rideShareTextView3a"
         android:layout_below="@+id/rideShareImageButton3"
         android:layout_centerHorizontal="true" />
@@ -111,7 +111,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/surge_rate"
+        android:hint="@string/surge_rate"
         android:id="@+id/rideShareTextView3b"
         android:layout_below="@+id/rideShareTextView3a"
         android:layout_centerHorizontal="true" />
@@ -132,7 +132,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/price"
+        android:hint="@string/price"
         android:layout_alignParentEnd="true"
         android:id="@+id/rideShareTextView4a"
         android:layout_below="@+id/rideShareImageButton4" />
@@ -142,7 +142,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:text="@string/surge_rate"
+        android:hint="@string/surge_rate"
         android:layout_alignParentEnd="true"
         android:id="@+id/rideShareTextView4b"
         android:layout_below="@+id/rideShareTextView4a" />
