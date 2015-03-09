@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +60,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     private BaseRideModel[] rideModels;
 
     //location
-    Context context;
+    public static Context context;
     GoogleApiClient mGoogleApiClient;
     //endregion
 
@@ -87,10 +88,13 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         initParse();
         getDeviceTokenHashed();
+        //onConnect proceeds with execution
+    }
+
+    protected void onResume() {
         makeGoogleMapsRequest();
         mGoogleApiClient.connect();
         retrieveHomeAddress();
-        //onConnect proceeds with execution
     }
     //endregion
 
@@ -144,8 +148,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     //region Touch Events
     /* Image Button onClick call to deeplink to specific apps */
-    public void deepLinkToApp(View view) {
-        Integer index = Integer.parseInt(view.getTag().toString()) -1;
+    public void deepLinkToApp(int index) {
 
         if (index >= 0 && index < rideModels.length) {
 
@@ -347,22 +350,18 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         //update home address
         autoCompView.setText(getUser().homeAddress);
 
-        //update buttons
-        Integer index = 1;
-        for (BaseRideModel model : rideModels) {
+        RideServicesAdapter adapter = new RideServicesAdapter(rideModels);
+        ListView serviceList = (ListView) findViewById(R.id.rideShareListView);
+        serviceList.setAdapter(adapter);
+        serviceList.setOnItemClickListener(new OnItemClickListener() {
 
-            int id = getResources().getIdentifier(imageButtonResource + index.toString(), "id", getContext().getPackageName());
-            ImageButton ride1 = (ImageButton) findViewById(id);
-            id = getResources().getIdentifier(textViewResource + index.toString() + "a", "id", getContext().getPackageName());
-            TextView ride1cost = (TextView) findViewById(id);
-            id = getResources().getIdentifier(textViewResource + index.toString() + "b", "id", getContext().getPackageName());
-            TextView ride1surge = (TextView) findViewById(id);
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position,
+                                    long id) {
+                deepLinkToApp(position);
+            }
+        });
 
-            ride1.setImageResource(getResources().getIdentifier(model.drawableImageResource, "drawable", getContext().getPackageName()));
-            ride1cost.setText(model.estimatedCost);
-            ride1surge.setText(model.surgeRate);
-            index++;
-        }
     }
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         String str = (String) adapterView.getItemAtPosition(position);

@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <ImageView
+        android:id="@+id/rideShareImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/rideShareCost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="23dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/rideShareImage"
+        android:text="CodeLearn Chapter 1"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/rideShareSurge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/rideShareImage"
+        android:layout_alignLeft="@+id/rideShareCost"
+        android:text="Description" />
+
+</RelativeLayout>
