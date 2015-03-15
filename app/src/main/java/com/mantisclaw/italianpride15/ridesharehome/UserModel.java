@@ -11,4 +11,5 @@ public class UserModel {
     public String startAddress;
     public String currentLatitude;
     public String currentLongitude;
+    public String currentCity;
 }

@@ -115,14 +115,14 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         try {
             addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
             if (addresses.size() > 0) {
-                String currentCity = addresses.get(0).getLocality();
+                getUser().currentCity = addresses.get(0).getLocality();
 
                 //track analytics
                 Map<String, String> dictionary = new HashMap<String, String>();
-                dictionary.put("Locality", currentCity);
+                dictionary.put("Locality", getUser().currentCity);
                 PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
 
-                proceedIfServiceIsAvailable(currentCity);
+                proceedIfServiceIsAvailable(getUser().currentCity);
             }
         } catch (IOException e) {
             e.printStackTrace();

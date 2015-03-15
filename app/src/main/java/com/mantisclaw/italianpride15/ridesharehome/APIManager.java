@@ -77,11 +77,9 @@ public class APIManager {
 
     public static void makeTaxiAPICall(BaseRideModel rideModel) throws ExecutionException, InterruptedException, JSONException {
 
-        //TODO: implement
-//        JSONObject response = makeNetworkRequest(rideModel.requestURL, null);
-//
-//        rideModel.estimatedCost = response.getString("cost");
-//        rideModel.surgeRate = "0";
+        JSONObject response = makeNetworkRequest(rideModel.requestURL, null);
+        Double cost = Double.parseDouble(response.getString("total_fare")) - Double.parseDouble(response.getString("tip_amount"));
+        rideModel.estimatedCost =  cost.toString();
     }
 
     public static JSONObject makeNetworkRequest(String urlString, String headerString) throws ExecutionException, InterruptedException {

@@ -5,28 +5,26 @@ package com.mantisclaw.italianpride15.ridesharehome;
  */
 public class TaxiRideModel extends BaseRideModel {
 
-    private static final String taxime_client_id = "";
-    private static final String taxime_base_url = "http://www.taxime.com/api/1/estimate.json?";
-    private static final String deepLink = "com.taxime.client";
+    private static final String taxiFareFinder_client_id = "mu3eprAPr2pe";
+    private static final String taxiFareFinder_base_url = "https://api.taxifarefinder.com/fare?";
+    private static final String deepLink = "";
     public String query;
 
     public TaxiRideModel(UserModel user) {
 
         //build url string
         StringBuilder urlString = new StringBuilder();
-        urlString.append(taxime_base_url);
-        urlString.append("from=");
-        urlString.append(user.startAddress);
-        urlString.append("&to=");
-        urlString.append(user.homeAddress);
-        urlString.append("&key=");
-        urlString.append(taxime_client_id);
-        urlString.append("&lat_lng=");
-        urlString.append(user.currentLatitude);
-        urlString.append(",");
-        urlString.append(user.currentLongitude);
+        urlString.append(taxiFareFinder_base_url);
+        urlString.append("key=");
+        urlString.append(taxiFareFinder_client_id);
+        urlString.append("&entity_handle=");
+        urlString.append(user.currentCity);
+        urlString.append("&origin=");
+        urlString.append(user.currentLongitude + "," + user.currentLongitude);
+        urlString.append("&destination=");
+        urlString.append(user.homeLatitude + "," + user.homeLongitude);
 
-        query = urlString.toString();
+        requestURL = urlString.toString();
         drawableImageResource = "taxi";
         deepLinkAppName = deepLink;
     }
