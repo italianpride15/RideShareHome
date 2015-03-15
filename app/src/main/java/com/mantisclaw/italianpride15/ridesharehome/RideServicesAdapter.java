@@ -1,10 +1,12 @@
 package com.mantisclaw.italianpride15.ridesharehome;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.lang.reflect.Array;
@@ -25,17 +27,17 @@ public class RideServicesAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return rideShareList.size();
+        return rideShareList.size()-1;
     }
 
     @Override
     public Object getItem(int position) {
-        return rideShareList.get(position);
+        return rideShareList.get(position+1);
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return position+1;
     }
 
     @Override
@@ -47,11 +49,18 @@ public class RideServicesAdapter extends BaseAdapter {
 
         TextView rideCost = (TextView) convertView.findViewById(R.id.rideShareCost);
         TextView rideSurge = (TextView) convertView.findViewById(R.id.rideShareSurge);
+        ImageView rideImage = (ImageView) convertView.findViewById(R.id.rideShareImage);
 
-        BaseRideModel rideModel = rideShareList.get(position);
+        BaseRideModel rideModel = rideShareList.get(position+1);
 
-        rideCost.setText(rideModel.estimatedCost);
-        rideSurge.setText(rideModel.surgeRate);
+        rideCost.setText("Estimate Cost: $" + rideModel.estimatedCost);
+        if (rideModel.surgeRate != null) {
+            rideSurge.setText("Surge Rate: " + rideModel.surgeRate);
+        } else {
+            rideSurge.setText("Surge Rate: n/a");
+        }
+        int id = MainActivity.context.getResources().getIdentifier(rideModel.drawableImageResource, "drawable", MainActivity.context.getPackageName());
+        rideImage.setImageResource(id);
 
         return convertView;
     }

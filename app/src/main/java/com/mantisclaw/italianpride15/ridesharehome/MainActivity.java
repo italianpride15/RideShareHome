@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.Image;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -17,7 +18,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -90,6 +93,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
 
     protected void onResume() {
+        super.onResume();
         makeGoogleMapsRequest();
         mGoogleApiClient.connect();
         retrieveHomeAddress();
@@ -146,6 +150,11 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     //region Touch Events
     /* Image Button onClick call to deeplink to specific apps */
+
+    public void deepLinkToApp(View view) {
+        deepLinkToApp(0);
+    }
+
     public void deepLinkToApp(int index) {
 
         if (index >= 0 && index < rideModels.length) {
@@ -268,7 +277,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     private void getPricesFromAvailableServices(ServiceAvailability services) {
 
-        rideModels = new BaseRideModel[services.numberOfAvailableServices-1];
+        rideModels = new BaseRideModel[services.numberOfAvailableServices];
         GoogleDirectionsAPI info = new GoogleDirectionsAPI(getUser());
 
         Integer index = 0;
@@ -321,20 +330,21 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
         }
 
-//        object = (ParseObject)services.rideShareDictionary.get("Taxi");
-//        if (object != null) {
-//            TaxiRideModel taxi = new TaxiRideModel(getUser());
-//            APIManager.makeAPICall(taxi, object, info);
-//            rideModels[index] = taxi;
-//            index++;
+        object = (ParseObject)services.rideShareDictionary.get("Taxi");
+        if (object != null) {
+            TaxiRideModel taxi = new TaxiRideModel(getUser());
+            APIManager.makeAPICall(taxi, object, info);
+            rideModels[index] = taxi;
+            index++;
 
-        //track analytics
-//        dictionary.clear();
-//        dictionary.put("ServiceAvailable", "Taxi");
-//        dictionary.put("ServiceCost", taxi.estimatedCost);
-//        dictionary.put("ServiceSurge", taxi.surgeRate);
-//        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
-//        }
+            //track analytics
+            dictionary.clear();
+            dictionary.put("ServiceAvailable", "Taxi");
+            dictionary.put("ServiceCost", taxi.estimatedCost);
+            dictionary.put("ServiceSurge", taxi.surgeRate);
+            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
+        }
+
         Arrays.sort(rideModels);
         updateViewWithData();
     }
@@ -348,6 +358,19 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         //update home address
         autoCompView.setText(getUser().homeAddress);
 
+        ImageButton cheapestServiceImage = (ImageButton) findViewById(R.id.rideShareImageButton);
+        TextView cheapestServiceCost = (TextView) findViewById(R.id.rideShareTextViewCost);
+        TextView cheapestServiceSurge = (TextView) findViewById(R.id.rideShareTextViewSurge);
+
+        int id = getResources().getIdentifier(rideModels[0].drawableImageResource, "drawable", getContext().getPackageName());
+        cheapestServiceImage.setImageResource(id);
+        cheapestServiceCost.setText("Estimate Cost: $" + rideModels[0].estimatedCost);
+        if (rideModels[0].surgeRate != null) {
+            cheapestServiceSurge.setText("Surge Rate: " + rideModels[0].surgeRate);
+        } else {
+            cheapestServiceSurge.setText("Surge Rate: n/a");
+        }
+
         RideServicesAdapter adapter = new RideServicesAdapter(rideModels);
         ListView serviceList = (ListView) findViewById(R.id.rideShareListView);
         serviceList.setAdapter(adapter);
@@ -356,7 +379,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position,
                                     long id) {
-                deepLinkToApp(position);
+                deepLinkToApp(position+1);
             }
         });
 
@@ -389,7 +412,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
-        deviceToken = deviceUuid.toString();
+        deviceToken = deviceUuid.toString().substring(deviceUuid.toString().length()-12, deviceUuid.toString().length());
     }
 
     private void showAlertDialog(String title, String message) {

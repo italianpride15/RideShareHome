@@ -29,8 +29,7 @@ public class PFAnalytics {
     }
 
     public static void trackEvent(AnalyticsCategory category, Map dictionary) {
-        dictionary.put("DeviceToken", "00000000-54b3-e7c7-0000-000046bffd97");
-        String cat = category.toString();
+        dictionary.put("DeviceToken", MainActivity.deviceToken);
         ParseAnalytics.trackEventInBackground(category.toString(), dictionary);
     }
 }

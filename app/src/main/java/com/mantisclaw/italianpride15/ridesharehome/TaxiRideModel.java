@@ -20,7 +20,7 @@ public class TaxiRideModel extends BaseRideModel {
         urlString.append("&entity_handle=");
         urlString.append(user.currentCity);
         urlString.append("&origin=");
-        urlString.append(user.currentLongitude + "," + user.currentLongitude);
+        urlString.append(user.currentLatitude + "," + user.currentLongitude);
         urlString.append("&destination=");
         urlString.append(user.homeLatitude + "," + user.homeLongitude);
 
