@@ -38,7 +38,7 @@ public class GoogleDirectionsAPI {
         urlString.append(",");
         urlString.append(user.currentLongitude);
         urlString.append("&destination=");
-        urlString.append(user.homeAddress);
+        urlString.append(user.homeAddress.replaceAll("\\s",""));
         urlString.append("&key=");
         urlString.append(directions_client_id);
 

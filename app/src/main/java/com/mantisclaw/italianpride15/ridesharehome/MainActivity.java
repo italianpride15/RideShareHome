@@ -114,10 +114,14 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         //get current city from location and check if service is available in user's area
         Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
         List<Address> addresses = null;
+        List<Address> homeAddress;
         try {
             addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-            if (addresses.size() > 0) {
+            homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
+            if (addresses.size() > 0 && homeAddress.size() > 0) {
                 getUser().currentCity = addresses.get(0).getLocality();
+                getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
+                getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
 
                 //track analytics
                 Map<String, String> dictionary = new HashMap<String, String>();
@@ -248,6 +252,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             dictionary.put("AddressStored", "true");
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
         }
+        mGoogleApiClient.reconnect();
+
     }
 
     private void proceedIfServiceIsAvailable(final String currentCity) {
@@ -385,11 +391,14 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     }
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        String str = (String) adapterView.getItemAtPosition(position);
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+        String newAddress = (String) adapterView.getItemAtPosition(position);
+        Toast.makeText(this, newAddress, Toast.LENGTH_SHORT).show();
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(autoCompView.getWindowToken(), 0);
+        autoCompView.clearFocus();
+        getUser().homeAddress = newAddress;
+        storeHomeAddress();
     }
 
     private void initParse() {

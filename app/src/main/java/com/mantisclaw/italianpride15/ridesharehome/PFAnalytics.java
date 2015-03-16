@@ -30,6 +30,8 @@ public class PFAnalytics {
 
     public static void trackEvent(AnalyticsCategory category, Map dictionary) {
         dictionary.put("DeviceToken", MainActivity.deviceToken);
-        ParseAnalytics.trackEventInBackground(category.toString(), dictionary);
+        if (BuildConfig.DEBUG == false) {
+            ParseAnalytics.trackEventInBackground(category.toString(), dictionary);
+        }
     }
 }
