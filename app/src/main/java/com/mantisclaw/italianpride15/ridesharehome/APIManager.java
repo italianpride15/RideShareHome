@@ -79,7 +79,7 @@ public class APIManager {
 
         JSONObject response = makeNetworkRequest(rideModel.requestURL, null);
         Double cost = Double.parseDouble(response.getString("total_fare")) - Double.parseDouble(response.getString("tip_amount"));
-        rideModel.estimatedCost =  cost.toString();
+        rideModel.estimatedCost =  String.format("%.2f", cost);
     }
 
     public static JSONObject makeNetworkRequest(String urlString, String headerString) throws ExecutionException, InterruptedException {

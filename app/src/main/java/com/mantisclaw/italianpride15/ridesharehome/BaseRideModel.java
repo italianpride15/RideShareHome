@@ -19,16 +19,27 @@ public class BaseRideModel implements Comparable<BaseRideModel> {
     public String surgeRate;
 
     public int compareTo(BaseRideModel rideModel) {
-        if (this.estimatedCost == null && rideModel.estimatedCost == null) {
+        try { //TODO: remove me
+            if (this.estimatedCost == null && rideModel.estimatedCost == null) {
+                return 0;
+            } else if (rideModel.estimatedCost == null && this.estimatedCost != null) {
+                return 0 - Integer.getInteger(this.estimatedCost);
+            } else if (this.estimatedCost == null && rideModel.estimatedCost != null) {
+                return 0 - Integer.getInteger(rideModel.estimatedCost);
+            } else {
+                Double compareEstimate = Double.parseDouble(rideModel.estimatedCost);
+                Double estimate = Double.parseDouble(this.estimatedCost);
+                return estimate.intValue() - compareEstimate.intValue();
+            }
+        } catch (Exception e) {
+            if (this.estimatedCost == null) {
+                this.estimatedCost = "n/a";
+            }
+            if (rideModel.estimatedCost == null) {
+                rideModel.estimatedCost = "n/a";
+            }
             return 0;
-        } else if (rideModel.estimatedCost == null && this.estimatedCost != null) {
-            return 0 - Integer.getInteger(this.estimatedCost);
-        } else if (this.estimatedCost == null && rideModel.estimatedCost != null) {
-            return 0 - Integer.getInteger(rideModel.estimatedCost);
-        } else {
-            Double compareEstimate = Double.parseDouble(rideModel.estimatedCost);
-            Double estimate = Double.parseDouble(this.estimatedCost);
-            return estimate.intValue() - compareEstimate.intValue();
         }
+
     }
 }

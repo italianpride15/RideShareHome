@@ -23,17 +23,20 @@
         android:hint="@string/home_address"
         android:id="@+id/HomeAddress"
         android:layout_below="@+id/MainTitle"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:singleLine="true"
+        />
 
     <ImageButton
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:id="@+id/rideShareImageButton"
         android:layout_centerHorizontal="true"
         android:scaleType="fitCenter"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="90dp"
         android:onClick="deepLinkToApp"
         android:tag="1"
+        android:background="@null"
         android:contentDescription="@string/accessibilityRideButton" />
 
     <TextView
@@ -41,7 +44,6 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:hint="@string/price"
         android:id="@+id/rideShareTextViewCost"
         android:layout_below="@+id/rideShareImageButton"
         android:layout_centerHorizontal="true" />
@@ -51,7 +53,6 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textAlignment="center"
-        android:hint="@string/surge_rate"
         android:id="@+id/rideShareTextViewSurge"
         android:layout_below="@+id/rideShareTextViewCost"
         android:layout_centerHorizontal="true" />
@@ -59,8 +60,10 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:id="@+id/rideShareListView"
         android:layout_alignParentStart="true"
+        android:scrollbars="none"
         android:layout_below="@+id/rideShareTextViewSurge" />
 
 

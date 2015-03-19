@@ -2,6 +2,7 @@ package com.mantisclaw.italianpride15.ridesharehome;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +21,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +62,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     //application objects
     public static UserModel user;
     private BaseRideModel[] rideModels;
+    private ProgressBar progressBar;
+    private TextView progressText;
 
     //location
     public static Context context;
@@ -89,6 +94,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         initParse();
         getDeviceTokenHashed();
+        startSpinner();
         //onConnect proceeds with execution
     }
 
@@ -115,23 +121,25 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
         List<Address> addresses = null;
         List<Address> homeAddress;
-        try {
-            addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-            homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
-            if (addresses.size() > 0 && homeAddress.size() > 0) {
-                getUser().currentCity = addresses.get(0).getLocality();
-                getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
-                getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
+        if (getUser().homeAddress != null) {
+            try {
+                addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
+                if (addresses.size() > 0 && homeAddress.size() > 0) {
+                    getUser().currentCity = addresses.get(0).getLocality();
+                    getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
+                    getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
 
-                //track analytics
-                Map<String, String> dictionary = new HashMap<String, String>();
-                dictionary.put("Locality", getUser().currentCity);
-                PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
+                    //track analytics
+                    Map<String, String> dictionary = new HashMap<String, String>();
+                    dictionary.put("Locality", getUser().currentCity);
+                    PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
 
-                proceedIfServiceIsAvailable(getUser().currentCity);
+                    proceedIfServiceIsAvailable(getUser().currentCity);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -224,12 +232,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             dictionary.put("NoAddress", "true");
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
 
-            getUser().homeAddress = "626W.Patterson,Chicago";
-            getUser().homeLatitude = "41.948756";
-            getUser().homeLongitude = "-87.647285";
-            //get user's address
-            //use google completion
-            storeHomeAddress();
+            showAlertDialog("Enter Address", "Please enter an address to continue.");
         } else {
             //track analytics
             Map<String, String> dictionary = new HashMap<String, String>();
@@ -253,12 +256,12 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
         }
         mGoogleApiClient.reconnect();
-
+        startSpinner();
     }
 
     private void proceedIfServiceIsAvailable(final String currentCity) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("CityRate");
-        query.whereEqualTo("City", "Chicago");
+        query.whereEqualTo("City", getUser().currentCity);
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> rideShareList, ParseException e) {
                 if (e == null) {
@@ -356,6 +359,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
 
     public void updateViewWithData() {
+        endSpinner();
+
         //setup autocomplete for home address
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
         autoCompView.setAdapter(new PlacesAutoCompleteAdapter(getContext(), R.layout.list_item, getUser()));
@@ -389,6 +394,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             }
         });
 
+        autoCompView.clearFocus();
     }
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         String newAddress = (String) adapterView.getItemAtPosition(position);
@@ -441,6 +447,38 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+    //endregion
+
+    //region Spinner
+    private void startSpinner() {
+        RelativeLayout layout = new RelativeLayout(this);
+        progressBar = new ProgressBar(MainActivity.this, null, android.R.attr.progressBarStyleLarge);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setId(1);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layout.addView(progressBar, params);
+
+        progressText = new TextView(MainActivity.this, null);
+        progressText.setText("Retrieving pricing to your destination");
+        progressText.setTextSize(18);
+        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 60);
+        textParams.addRule(RelativeLayout.ABOVE, progressBar.getId());
+        textParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        layout.addView(progressText, textParams);
+
+        setContentView(layout);
+    }
+
+    private void endSpinner() {
+        RelativeLayout layout = new RelativeLayout(this);
+        layout.removeView(progressBar);
+        layout.removeView(progressText);
+        progressBar = null;
+        progressText = null;
+        setContentView(R.layout.activity_main);
     }
     //endregion
 
