@@ -121,7 +121,10 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
         List<Address> addresses = null;
         List<Address> homeAddress;
-        if (getUser().homeAddress != null) {
+        if (mLastLocation == null) {
+            showAlertDialog("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
+            updateViewWithData();
+        } else if (getUser().homeAddress != null) {
             try {
                 addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
                 homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
@@ -139,6 +142,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                updateViewWithData();
             }
         }
     }
@@ -169,47 +173,49 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     public void deepLinkToApp(int index) {
 
-        if (index >= 0 && index < rideModels.length) {
+        if (rideModels != null) {
+            if (index >= 0 && index < rideModels.length) {
 
-            PackageManager pm = getContext().getPackageManager();
-            try
-            {
-                pm.getPackageInfo(rideModels[index].deepLinkAppName, PackageManager.GET_ACTIVITIES);
-                // The app is installed! Launch App.
+                PackageManager pm = getContext().getPackageManager();
+                try
+                {
+                    pm.getPackageInfo(rideModels[index].deepLinkAppName, PackageManager.GET_ACTIVITIES);
+                    // The app is installed! Launch App.
 
-                //track analytics
-                Map<String, String> dictionary = new HashMap<String, String>();
-                dictionary.put("AppIsInstalled", rideModels[index].deepLinkAppName);
-                PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
+                    //track analytics
+                    Map<String, String> dictionary = new HashMap<String, String>();
+                    dictionary.put("AppIsInstalled", rideModels[index].deepLinkAppName);
+                    PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
-                dictionary.clear();
-                dictionary.put("ServiceType", rideModels[index].deepLinkAppName);
-                dictionary.put("ServiceRank", Integer.toString(index));
-                if (index != 0) {
-                    Integer tempIndex = index;
-                    while (tempIndex > 0) {
-                        tempIndex -= 1;
-                        dictionary.put("ServiceAhead" + Integer.toString(tempIndex), rideModels[tempIndex].deepLinkAppName);
-                        dictionary.put("ServiceAheadCost" + Integer.toString(tempIndex), rideModels[tempIndex].estimatedCost);
-                        dictionary.put("ServiceAheadSurge" + Integer.toString(tempIndex), rideModels[tempIndex].surgeRate);
+                    dictionary.clear();
+                    dictionary.put("ServiceType", rideModels[index].deepLinkAppName);
+                    dictionary.put("ServiceRank", Integer.toString(index));
+                    if (index != 0) {
+                        Integer tempIndex = index;
+                        while (tempIndex > 0) {
+                            tempIndex -= 1;
+                            dictionary.put("ServiceAhead" + Integer.toString(tempIndex), rideModels[tempIndex].deepLinkAppName);
+                            dictionary.put("ServiceAheadCost" + Integer.toString(tempIndex), rideModels[tempIndex].estimatedCost);
+                            dictionary.put("ServiceAheadSurge" + Integer.toString(tempIndex), rideModels[tempIndex].surgeRate);
+                        }
                     }
-                }
-                PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
+                    PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
-                Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(rideModels[index].deepLinkAppName);
-                startActivity(LaunchIntent);
+                    Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(rideModels[index].deepLinkAppName);
+                    startActivity(LaunchIntent);
 //                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(rideModels[index].deepLinkQuery));
 //                getContext().startActivity(intent);
-            }
-            catch (PackageManager.NameNotFoundException e)
-            {
-                //track analytics
-                Map<String, String> dictionary = new HashMap<String, String>();
-                dictionary.put("AppNotInstalled", rideModels[index].deepLinkAppName);
-                PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
+                }
+                catch (PackageManager.NameNotFoundException e)
+                {
+                    //track analytics
+                    Map<String, String> dictionary = new HashMap<String, String>();
+                    dictionary.put("AppNotInstalled", rideModels[index].deepLinkAppName);
+                    PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
-                // App not installed! Launch popup.
-                showAlertDialog("App Not Installed", "Please install the app.");
+                    // App not installed! Launch popup.
+                    showAlertDialog("App Not Installed", "Please install the app.");
+                }
             }
         }
     }
@@ -233,6 +239,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
 
             showAlertDialog("Enter Address", "Please enter an address to continue.");
+            updateViewWithData();
         } else {
             //track analytics
             Map<String, String> dictionary = new HashMap<String, String>();
@@ -369,30 +376,33 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         //update home address
         autoCompView.setText(getUser().homeAddress);
 
-        ImageButton cheapestServiceImage = (ImageButton) findViewById(R.id.rideShareImageButton);
-        TextView cheapestServiceCost = (TextView) findViewById(R.id.rideShareTextViewCost);
-        TextView cheapestServiceSurge = (TextView) findViewById(R.id.rideShareTextViewSurge);
+        if (rideModels != null) {
 
-        int id = getResources().getIdentifier(rideModels[0].drawableImageResource, "drawable", getContext().getPackageName());
-        cheapestServiceImage.setImageResource(id);
-        cheapestServiceCost.setText("Estimate Cost: $" + rideModels[0].estimatedCost);
-        if (rideModels[0].surgeRate != null) {
-            cheapestServiceSurge.setText("Surge Rate: " + rideModels[0].surgeRate);
-        } else {
-            cheapestServiceSurge.setText("Surge Rate: n/a");
-        }
+            ImageButton cheapestServiceImage = (ImageButton) findViewById(R.id.rideShareImageButton);
+            TextView cheapestServiceCost = (TextView) findViewById(R.id.rideShareTextViewCost);
+            TextView cheapestServiceSurge = (TextView) findViewById(R.id.rideShareTextViewSurge);
 
-        RideServicesAdapter adapter = new RideServicesAdapter(rideModels);
-        ListView serviceList = (ListView) findViewById(R.id.rideShareListView);
-        serviceList.setAdapter(adapter);
-        serviceList.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position,
-                                    long id) {
-                deepLinkToApp(position+1);
+            int id = getResources().getIdentifier(rideModels[0].drawableImageResource, "drawable", getContext().getPackageName());
+            cheapestServiceImage.setImageResource(id);
+            cheapestServiceCost.setText("Estimate Cost: $" + rideModels[0].estimatedCost);
+            if (rideModels[0].surgeRate != null) {
+                cheapestServiceSurge.setText("Surge Rate: " + rideModels[0].surgeRate);
+            } else {
+                cheapestServiceSurge.setText("Surge Rate: n/a");
             }
-        });
+
+            RideServicesAdapter adapter = new RideServicesAdapter(rideModels);
+            ListView serviceList = (ListView) findViewById(R.id.rideShareListView);
+            serviceList.setAdapter(adapter);
+            serviceList.setOnItemClickListener(new OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position,
+                                        long id) {
+                    deepLinkToApp(position+1);
+                }
+            });
+        }
 
         autoCompView.clearFocus();
     }
@@ -462,9 +472,10 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         layout.addView(progressBar, params);
 
         progressText = new TextView(MainActivity.this, null);
-        progressText.setText("Retrieving pricing to your destination");
+        progressText.setText("Calculating prices...");
         progressText.setTextSize(18);
         RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 60);
+        textParams.setMargins(0, 0, 0, 30);
         textParams.addRule(RelativeLayout.ABOVE, progressBar.getId());
         textParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         layout.addView(progressText, textParams);
