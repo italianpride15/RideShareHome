@@ -203,8 +203,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
                     Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(rideModels[index].deepLinkAppName);
                     startActivity(LaunchIntent);
-//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(rideModels[index].deepLinkQuery));
-//                getContext().startActivity(intent);
                 }
                 catch (PackageManager.NameNotFoundException e)
                 {
@@ -239,7 +237,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
 
             showAlertDialog("Enter Address", "Please enter an address to continue.");
-            updateViewWithData();
         } else {
             //track analytics
             Map<String, String> dictionary = new HashMap<String, String>();
@@ -282,7 +279,12 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                         ServiceAvailability services = new ServiceAvailability(rideShareList);
                         getPricesFromAvailableServices(services);
                     } else {
-                        showAlertDialog("Services Not Available", "Sorry, this app is not yet available in your city.");
+                        //track analytics
+                        Map<String, String> dictionary = new HashMap<String, String>();
+                        dictionary.put("LocationUnavailable", getUser().currentCity);
+                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
+                        showAlertDialog("Services Not Available", "Sorry, your devices shows you are currently in " +
+                        getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + "soon.");
                     }
                 } else {
                     showAlertDialog("Network Error", "Could not retrieve available services.");
@@ -418,9 +420,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
 
     private void initParse() {
-        ParseCrashReporting.enable(this);
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, parse_application_id, parse_client_id);
+        ParseCrashReporting.enable(getContext());
+        Parse.enableLocalDatastore(getContext());
+        Parse.initialize(getContext(), parse_application_id, parse_client_id);
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
@@ -457,6 +459,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        if (!title.equals("App Not Installed")) {
+            updateViewWithData();
+        }
     }
     //endregion
 
@@ -474,7 +479,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         progressText = new TextView(MainActivity.this, null);
         progressText.setText("Calculating prices...");
         progressText.setTextSize(18);
-        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 60);
+        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 80);
         textParams.setMargins(0, 0, 0, 30);
         textParams.addRule(RelativeLayout.ABOVE, progressBar.getId());
         textParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
