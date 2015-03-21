@@ -2,7 +2,6 @@ package com.mantisclaw.italianpride15.ridesharehome;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.media.Image;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -32,9 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient.*;
 
 import com.google.android.gms.location.LocationServices;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseAnalytics;
-import com.parse.ParseCrashReporting;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -50,14 +46,7 @@ import java.util.UUID;
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, OnItemClickListener {
 
     //region VARIABLES
-    //parse
-    private static final String parse_application_id = "Z6WVHg75MPlkEmPYDB8Oa5CED9Wukm7UyGi1w79s";
-    private static final String parse_client_id = "s5OF0qYXOgRelbps5ySIOBLeoG4GnrgL6BXprtQQ";
     public static String deviceToken;
-
-    //resource
-    private static final String imageButtonResource = "rideShareImageButton";
-    private static final String textViewResource = "rideShareTextView";
 
     //application objects
     public static UserModel user;
@@ -92,7 +81,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initParse();
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
         getDeviceTokenHashed();
         startSpinner();
         //onConnect proceeds with execution
@@ -417,13 +406,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         autoCompView.clearFocus();
         getUser().homeAddress = newAddress;
         storeHomeAddress();
-    }
-
-    private void initParse() {
-        ParseCrashReporting.enable(getContext());
-        Parse.enableLocalDatastore(getContext());
-        Parse.initialize(getContext(), parse_application_id, parse_client_id);
-        ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 
     /*
