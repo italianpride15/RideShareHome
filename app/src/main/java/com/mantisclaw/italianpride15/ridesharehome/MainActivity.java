@@ -273,7 +273,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                         dictionary.put("LocationUnavailable", getUser().currentCity);
                         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
                         showAlertDialog("Services Not Available", "Sorry, your devices shows you are currently in " +
-                        getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + "soon.");
+                        getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + " soon.");
                     }
                 } else {
                     showAlertDialog("Network Error", "Could not retrieve available services.");
