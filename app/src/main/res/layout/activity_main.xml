@@ -21,7 +21,7 @@
         android:layout_height="40dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textAlignment="center"
-        android:hint="@string/home_address"
+        android:hint="@string/destination"
         android:id="@+id/HomeAddress"
         android:layout_below="@+id/MainTitle"
         android:layout_centerHorizontal="true"
@@ -37,8 +37,7 @@
         android:layout_marginTop="90dp"
         android:onClick="deepLinkToApp"
         android:tag="1"
-        android:background="@null"
-        android:contentDescription="@string/accessibilityRideButton" />
+        android:background="@null" />
 
     <TextView
         android:layout_width="wrap_content"
