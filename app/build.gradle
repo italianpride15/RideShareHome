@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'italianpride15androidkey'
+            keyPassword 'prat0jO2hAj5tIb7vId2teV6S'
+            storeFile file('/Users/italianpride15/keystores/android.jks')
+            storePassword 'prat0jO2hAj5tIb7vId2teV6S'
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
     defaultConfig {
         applicationId "com.mantisclaw.italianpride15.ridesharehome"
         minSdkVersion 17
@@ -15,6 +22,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
             debuggable true
