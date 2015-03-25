@@ -83,12 +83,12 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
         getDeviceTokenHashed();
-        startSpinner();
         //onConnect proceeds with execution
     }
 
     protected void onResume() {
         super.onResume();
+        startSpinner();
         makeGoogleMapsRequest();
         mGoogleApiClient.connect();
         retrieveHomeAddress();
@@ -111,7 +111,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         List<Address> addresses = null;
         List<Address> homeAddress;
         if (mLastLocation == null) {
-            showAlertDialog("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
+            toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
             updateViewWithData();
         } else if (getUser().homeAddress != null) {
             try {
@@ -141,7 +141,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
 
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        showAlertDialog("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
+        toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -230,7 +230,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             dictionary.put("NoAddress", "true");
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
 
-            showAlertDialog("Enter Address", "Please enter an address to continue.");
+            toastMessage("Enter Address", "Please enter an address to continue.");
         } else {
             //track analytics
             Map<String, String> dictionary = new HashMap<String, String>();
@@ -277,11 +277,11 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                         Map<String, String> dictionary = new HashMap<String, String>();
                         dictionary.put("LocationUnavailable", getUser().currentCity);
                         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
-                        showAlertDialog("Services Not Available", "Sorry, your devices shows you are currently in " +
-                        getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + " soon.");
+                        toastMessage("Services Not Available", "Sorry, your devices shows you are currently in " +
+                                getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + " soon.");
                     }
                 } else {
-                    showAlertDialog("Network Error", "Could not retrieve available services.");
+                    toastMessage("Network Error", "Could not retrieve available services.");
                 }
             }
         });
@@ -429,23 +429,15 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         deviceToken = deviceUuid.toString().substring(deviceUuid.toString().length()-12, deviceUuid.toString().length());
     }
 
-    private void showAlertDialog(String title, String message) {
+    private void toastMessage(String title, String message) {
 
         //track analytics
         Map<String, String> dictionary = new HashMap<String, String>();
         dictionary.put(title, message);
         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.ALERTS, dictionary);
 
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
         if (!title.equals("App Not Installed")) {
             updateViewWithData();
         }
