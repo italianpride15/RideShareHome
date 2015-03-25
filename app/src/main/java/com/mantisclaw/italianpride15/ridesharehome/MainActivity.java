@@ -35,6 +35,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -363,9 +364,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     private void sortArrayByCostAndInstalled() {
 
-        LinkedList<BaseRideModel> installedModelsLL = new LinkedList<BaseRideModel>();
-        LinkedList<BaseRideModel> unavailableModelsLL = new LinkedList<BaseRideModel>();
-
         PackageManager pm = getContext().getPackageManager();
 
         //check if apps are installed
@@ -374,39 +372,16 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                 try {
                     pm.getPackageInfo(model.deepLinkAppName, PackageManager.GET_ACTIVITIES);
                     model.isInstalled = true;
-                    installedModelsLL.add(model);
                 } catch (Exception e) {
                     model.isInstalled = false;
-                    unavailableModelsLL.add(model);
                 }
             } else {
                 //since we don't have a taxi app, assumed installed to not discourage use
-                installedModelsLL.add(model);
+                model.isInstalled = true;
             }
         }
 
-        BaseRideModel[] installedModels = installedModelsLL.toArray(new BaseRideModel[installedModelsLL.size()]);
-        BaseRideModel[] unavailableModels = unavailableModelsLL.toArray(new BaseRideModel[unavailableModelsLL.size()]);
-
-        //sort each array by cost
-        Arrays.sort(installedModels);
-        Arrays.sort(unavailableModels);
-
-        //combine back into one array
-        int currIndex = 0;
-        for (int i = 0; i < installedModels.length; i++) {
-            if (installedModels[i] != null) {
-                rideModels[currIndex] = installedModels[i];
-                currIndex++;
-            }
-        }
-
-        for (int i = 0; i < unavailableModels.length; i++) {
-            if (unavailableModels[i] != null) {
-                rideModels[currIndex] = unavailableModels[i];
-                currIndex++;
-            }
-        }
+        Arrays.sort(rideModels);
     }
 
     public void updateViewWithData() {
