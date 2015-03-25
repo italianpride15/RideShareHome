@@ -26,6 +26,7 @@ public class TaxiRideModel extends BaseRideModel {
 
         requestURL = urlString.toString();
         drawableImageResource = "taxi";
+        serviceName = "Taxi";
         deepLinkAppName = deepLink;
     }
 }

@@ -191,6 +191,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                     PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
                     Intent LaunchIntent = getPackageManager().getLaunchIntentForPackage(rideModels[index].deepLinkAppName);
+                    if (rideModels[index].deepLinkQuery != null) {
+                        LaunchIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rideModels[index].deepLinkQuery));
+                    }
                     startActivity(LaunchIntent);
                 }
                 catch (PackageManager.NameNotFoundException e)
@@ -201,7 +204,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                     PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
                     // App not installed! Launch popup.
-                    showAlertDialog("App Not Installed", "Please install the app.");
+                    if (!rideModels[index].serviceName.equals("Taxi")) {
+                        toastMessage("App Not Installed", "Please install the " + rideModels[index].serviceName + " app.");
+                    }
                 }
             }
         }

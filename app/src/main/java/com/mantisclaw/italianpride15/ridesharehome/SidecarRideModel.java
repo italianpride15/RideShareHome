@@ -10,6 +10,7 @@ public class SidecarRideModel extends BaseRideModel {
     public SidecarRideModel(UserModel user) {
         drawableImageResource = "sidecar";
         deepLinkAppName = deepLink;
+        serviceName = "Sidecar";
         //fill in when API becomes available
     }
 }

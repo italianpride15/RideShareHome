@@ -10,6 +10,7 @@ public class LyftRideModel extends BaseRideModel {
     public LyftRideModel(UserModel user) {
         drawableImageResource = "lyft";
         deepLinkAppName = deepLink;
+        serviceName = "Lyft";
         //fill in when API becomes available
     }
 }

@@ -49,6 +49,8 @@ public class APIManager {
         }
         rideModel.estimatedCost = uberX.getString("high_estimate");
         rideModel.surgeRate = uberX.getString("surge_multiplier");
+        rideModel.deepLinkQuery += "&product_id=" + uberX.get("product_id");
+        String test = rideModel.deepLinkQuery;
     }
 
     public static void makeLyftAPICall(BaseRideModel rideModel, ParseObject object, GoogleDirectionsAPI info)
