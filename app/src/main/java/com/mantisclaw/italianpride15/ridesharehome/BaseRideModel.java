@@ -5,6 +5,8 @@ package com.mantisclaw.italianpride15.ridesharehome;
  */
 public class BaseRideModel implements Comparable<BaseRideModel> {
 
+    public String serviceName;
+
     //API variables
     public String client_id;
     public String requestURL;
@@ -17,6 +19,8 @@ public class BaseRideModel implements Comparable<BaseRideModel> {
     //Cost variables
     public String estimatedCost;
     public String surgeRate;
+
+    public boolean isInstalled = false;
 
     public int compareTo(BaseRideModel rideModel) {
         try { //TODO: remove me
