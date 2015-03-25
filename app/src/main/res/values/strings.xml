@@ -3,6 +3,6 @@
 
     <string name="main_title">Privy - Travel Intelligently</string>
     <string name="destination">Destination</string>
-
+    <string name="loading">Refreshing pricing...</string>
     <string name="action_settings">Settings</string>
 </resources>
