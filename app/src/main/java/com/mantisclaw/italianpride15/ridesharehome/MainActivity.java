@@ -9,6 +9,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.View;
@@ -48,7 +49,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     public static String deviceToken;
 
     //application objects
-    public static UserModel user;
+    private static UserModel user;
     private BaseRideModel[] rideModels;
     private ProgressBar progressBar;
     private TextView progressText;
@@ -94,45 +95,55 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
     //endregion
 
+    public class LoadRequestsInBackground extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+
+            //get last location
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation != null) {
+                getUser().currentLatitude = String.valueOf(mLastLocation.getLatitude());
+                getUser().currentLongitude = String.valueOf(mLastLocation.getLongitude());
+            }
+
+            //get current city from location and check if service is available in user's area
+            Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
+            List<Address> addresses;
+            List<Address> homeAddress;
+            if (mLastLocation == null) {
+                toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
+                updateViewWithData();
+            } else if (getUser().homeAddress != null) {
+                try {
+                    addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                    homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
+                    if (addresses.size() > 0 && homeAddress.size() > 0) {
+                        getUser().currentCity = addresses.get(0).getLocality();
+                        getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
+                        getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
+
+                        //track analytics
+                        Map<String, String> dictionary = new HashMap<>();
+                        dictionary.put("Locality", getUser().currentCity);
+                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
+
+                        proceedIfServiceIsAvailable(getUser().currentCity);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    updateViewWithData();
+                }
+            }
+            return true;
+        }
+    }
+
     //region Location Callbacks
     @Override
     public void onConnected(Bundle connectionHint) {
-        //get last location
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            getUser().currentLatitude = String.valueOf(mLastLocation.getLatitude());
-            getUser().currentLongitude = String.valueOf(mLastLocation.getLongitude());
-        }
-
-        //get current city from location and check if service is available in user's area
-        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
-        List<Address> addresses;
-        List<Address> homeAddress;
-        if (mLastLocation == null) {
-            toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
-            updateViewWithData();
-        } else if (getUser().homeAddress != null) {
-            try {
-                addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
-                if (addresses.size() > 0 && homeAddress.size() > 0) {
-                    getUser().currentCity = addresses.get(0).getLocality();
-                    getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
-                    getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
-
-                    //track analytics
-                    Map<String, String> dictionary = new HashMap<>();
-                    dictionary.put("Locality", getUser().currentCity);
-                    PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
-
-                    proceedIfServiceIsAvailable(getUser().currentCity);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                updateViewWithData();
-            }
-        }
+        new LoadRequestsInBackground().execute();
     }
 
     public void onConnectionSuspended(int i) {}
@@ -157,7 +168,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         deepLinkToApp(0);
     }
 
-    public void deepLinkToApp(int index) {
+    private void deepLinkToApp(int index) {
 
         if (rideModels != null) {
             if (index >= 0 && index < rideModels.length) {
@@ -251,7 +262,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
         }
         mGoogleApiClient.reconnect();
-        startSpinner();
     }
 
     private void proceedIfServiceIsAvailable(final String currentCity) {
@@ -379,10 +389,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         Arrays.sort(rideModels);
     }
 
-    public void updateViewWithData() {
+    private void updateViewWithData() {
         endSpinner();
 
-        //setup autocomplete for home address
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
         autoCompView.setAdapter(new PlacesAutoCompleteAdapter(getContext(), R.layout.list_item, getUser()));
         autoCompView.setOnItemClickListener(this);
@@ -494,6 +503,5 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         setContentView(R.layout.activity_main);
     }
     //endregion
-
 
 }
