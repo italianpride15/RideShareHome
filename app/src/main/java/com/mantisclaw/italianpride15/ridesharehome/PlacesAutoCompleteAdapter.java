@@ -42,7 +42,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
 
     @Override
     public Filter getFilter() {
-        Filter filter = new Filter() {
+      return new Filter() {
             @Override
             protected Filter.FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
@@ -50,13 +50,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
                     // Retrieve the autocomplete results.
                     try {
                         resultList = autocomplete(constraint.toString(), user);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
@@ -76,12 +70,11 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
                     notifyDataSetInvalidated();
                 }
             }};
-        return filter;
     }
 
     private ArrayList<String> autocomplete(String input, UserModel user)
             throws UnsupportedEncodingException, ExecutionException, InterruptedException, JSONException {
-        ArrayList<String> resultList = null;
+        ArrayList<String> resultList;
 
         StringBuilder urlString = new StringBuilder(placesAPIURL);
         urlString.append("input=" + URLEncoder.encode(input, "utf8"));
@@ -93,7 +86,7 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
         JSONArray predsJsonArray = jsonObj.getJSONArray("predictions");
 
         // Extract the Place descriptions from the results
-        resultList = new ArrayList<String>(predsJsonArray.length());
+        resultList = new ArrayList<>(predsJsonArray.length());
         for (Integer i = 0; i < predsJsonArray.length(); i++) {
             String address = predsJsonArray.getJSONObject(i).getString("description");
             Integer index = predsJsonArray.getJSONObject(i).getJSONArray("terms").getJSONObject(3).getInt("offset");

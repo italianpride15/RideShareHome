@@ -40,17 +40,29 @@ public class APIManager {
         JSONObject response = makeNetworkRequest(rideModel.requestURL, headerString.toString());
         JSONArray array = response.getJSONArray("prices");
 
-        JSONObject uberX = null;
+        JSONObject uberX = new JSONObject();
         for (Integer i = 0; i < array.length()-1; i++) {
             JSONObject object = array.getJSONObject(i);
             if (object.getString("display_name").equals("uberX")) {
                 uberX = object;
             }
         }
-        rideModel.estimatedCost = uberX.getString("high_estimate");
+
+        String highEstimate = uberX.getString("high_estimate");
+        String lowEstimate = uberX.getString("low_estimate");
+        String estimate = "n/a";
+
+        if (highEstimate != null && lowEstimate != null) {
+            Double average = ((Double.parseDouble(highEstimate) + Double.parseDouble(lowEstimate)) / 2);
+            estimate = average.toString();
+        } else if (highEstimate != null) {
+            estimate = highEstimate;
+        } else if (lowEstimate != null) {
+            estimate = lowEstimate;
+        }
+        rideModel.estimatedCost = estimate;
         rideModel.surgeRate = uberX.getString("surge_multiplier");
         rideModel.deepLinkQuery += "&product_id=" + uberX.get("product_id");
-        String test = rideModel.deepLinkQuery;
     }
 
     public static void makeLyftAPICall(BaseRideModel rideModel, ParseObject object, GoogleDirectionsAPI info)

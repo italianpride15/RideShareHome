@@ -19,11 +19,7 @@ public class GoogleDirectionsAPI {
     public GoogleDirectionsAPI(UserModel user) {
         try {
             getDirections(user);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

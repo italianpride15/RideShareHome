@@ -3,7 +3,6 @@ package com.mantisclaw.italianpride15.ridesharehome;
 import android.app.Application;
 
 import com.parse.Parse;
-import com.parse.ParseAnalytics;
 import com.parse.ParseCrashReporting;
 
 /**
@@ -12,8 +11,8 @@ import com.parse.ParseCrashReporting;
 
 public class MainApp extends Application {
 
-    private static final String parse_application_id = "Z6WVHg75MPlkEmPYDB8Oa5CED9Wukm7UyGi1w79s";
-    private static final String parse_client_id = "s5OF0qYXOgRelbps5ySIOBLeoG4GnrgL6BXprtQQ";
+    private static final String parse_application_id = "pTCU4Li4XZE82K6QN7XSoWv3xM9ABWWsWBfe1zD6";
+    private static final String parse_client_id = "fF5j0OolWrJTvzOQqGEVGEbiA4buNdYdhs3z962u";
 
     @Override
     public void onCreate() {

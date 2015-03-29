@@ -1,7 +1,6 @@
 package com.mantisclaw.italianpride15.ridesharehome;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +20,7 @@ public class RideServicesAdapter extends BaseAdapter {
     List<BaseRideModel> rideShareList;
 
     public RideServicesAdapter(BaseRideModel[] array) {
-        rideShareList = new ArrayList<BaseRideModel>(Arrays.asList(array));
+        rideShareList = new ArrayList<>(Arrays.asList(array));
     }
 
     @Override

@@ -27,7 +27,7 @@ public class HttpUrlConnection extends AsyncTask <String, Integer, JSONObject> {
 
     @Override
     protected JSONObject doInBackground(String... params) {
-        URL url = null;
+        URL url;
         HttpsURLConnection urlConnection = null;
         JSONObject jsonObject = new JSONObject();
 

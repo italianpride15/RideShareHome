@@ -8,7 +8,6 @@ public class TaxiRideModel extends BaseRideModel {
     private static final String taxiFareFinder_client_id = "mu3eprAPr2pe";
     private static final String taxiFareFinder_base_url = "https://api.taxifarefinder.com/fare?";
     private static final String deepLink = "";
-    public String query;
 
     public TaxiRideModel(UserModel user) {
 

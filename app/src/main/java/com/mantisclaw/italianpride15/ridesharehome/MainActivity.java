@@ -35,10 +35,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -109,7 +107,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
         //get current city from location and check if service is available in user's area
         Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
-        List<Address> addresses = null;
+        List<Address> addresses;
         List<Address> homeAddress;
         if (mLastLocation == null) {
             toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
@@ -124,7 +122,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                     getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
 
                     //track analytics
-                    Map<String, String> dictionary = new HashMap<String, String>();
+                    Map<String, String> dictionary = new HashMap<>();
                     dictionary.put("Locality", getUser().currentCity);
                     PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
 
@@ -137,9 +135,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         }
     }
 
-    public void onConnectionSuspended(int i) {
-        return;
-    }
+    public void onConnectionSuspended(int i) {}
 
     public void onConnectionFailed(ConnectionResult connectionResult) {
         toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
@@ -173,7 +169,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                     // The app is installed! Launch App.
 
                     //track analytics
-                    Map<String, String> dictionary = new HashMap<String, String>();
+                    Map<String, String> dictionary = new HashMap<>();
                     dictionary.put("AppIsInstalled", rideModels[index].deepLinkAppName);
                     PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
@@ -200,7 +196,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                 catch (PackageManager.NameNotFoundException e)
                 {
                     //track analytics
-                    Map<String, String> dictionary = new HashMap<String, String>();
+                    Map<String, String> dictionary = new HashMap<>();
                     dictionary.put("AppNotInstalled", rideModels[index].deepLinkAppName);
                     PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.DEEPLINK, dictionary);
 
@@ -221,20 +217,20 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     private void retrieveHomeAddress() {
 
-        SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", getContext().MODE_PRIVATE);
+        SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", MODE_PRIVATE);
         getUser().homeAddress = preferences.getString("homeAddress", null);
 
         if (getUser().homeAddress == null) {
 
             //track analytics
-            Map<String, String> dictionary = new HashMap<String, String>();
+            Map<String, String> dictionary = new HashMap<>();
             dictionary.put("NoAddress", "true");
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
 
             toastMessage("Enter Address", "Please enter an address to continue.");
         } else {
             //track analytics
-            Map<String, String> dictionary = new HashMap<String, String>();
+            Map<String, String> dictionary = new HashMap<>();
             dictionary.put("AddressRetrieved", "true");
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
         }
@@ -242,7 +238,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     private void storeHomeAddress() {
         if (getUser().homeAddress != null) {
-            SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", getContext().MODE_PRIVATE);
+            SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("homeAddress", getUser().homeAddress);
             editor.putString("homeLatitude", getUser().homeLatitude);
@@ -250,7 +246,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             editor.commit();
 
             //track analytics
-            Map<String, String> dictionary = new HashMap<String, String>();
+            Map<String, String> dictionary = new HashMap<>();
             dictionary.put("AddressStored", "true");
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
         }
@@ -267,7 +263,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                     if (rideShareList.size() > 0) {
 
                         //track analytics
-                        Map<String, String> dictionary = new HashMap<String, String>();
+                        Map<String, String> dictionary = new HashMap<>();
                         dictionary.put("NumberOfServices", Integer.toString(rideShareList.size()));
                         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
 
@@ -275,7 +271,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                         getPricesFromAvailableServices(services);
                     } else {
                         //track analytics
-                        Map<String, String> dictionary = new HashMap<String, String>();
+                        Map<String, String> dictionary = new HashMap<>();
                         dictionary.put("LocationUnavailable", getUser().currentCity);
                         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
                         toastMessage("Services Not Available", "Sorry, your devices shows you are currently in " +
@@ -296,9 +292,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         Integer index = 0;
         ParseObject object;
 
-        Map<String, String> dictionary = new HashMap<String, String>();
+        Map<String, String> dictionary = new HashMap<>();
 
-        object = (ParseObject)services.rideShareDictionary.get("Uber");
+        object = services.rideShareDictionary.get("Uber");
         if (object != null) {
             UberRideModel uber = new UberRideModel(getUser());
             APIManager.makeAPICall(uber, object, info);
@@ -313,7 +309,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
         }
 
-        object = (ParseObject)services.rideShareDictionary.get("Lyft");
+        object = services.rideShareDictionary.get("Lyft");
         if (object != null) {
             LyftRideModel lyft = new LyftRideModel(getUser());
             APIManager.makeAPICall(lyft, object, info);
@@ -328,7 +324,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
         }
 
-        object = (ParseObject)services.rideShareDictionary.get("Sidecar");
+        object = services.rideShareDictionary.get("Sidecar");
         if (object != null) {
             SidecarRideModel sidecar = new SidecarRideModel(getUser());
             APIManager.makeAPICall(sidecar, object, info);
@@ -343,12 +339,11 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
         }
 
-        object = (ParseObject)services.rideShareDictionary.get("Taxi");
+        object = services.rideShareDictionary.get("Taxi");
         if (object != null) {
             TaxiRideModel taxi = new TaxiRideModel(getUser());
             APIManager.makeAPICall(taxi, object, info);
             rideModels[index] = taxi;
-            index++;
 
             //track analytics
             dictionary.clear();
@@ -455,7 +450,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     private void toastMessage(String title, String message) {
 
         //track analytics
-        Map<String, String> dictionary = new HashMap<String, String>();
+        Map<String, String> dictionary = new HashMap<>();
         dictionary.put(title, message);
         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.ALERTS, dictionary);
 
