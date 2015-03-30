@@ -21,7 +21,9 @@ public class MainApp extends Application {
     }
 
     private void initParse() {
-        ParseCrashReporting.enable(this);
+        if (!BuildConfig.DEBUG) {
+            ParseCrashReporting.enable(this);
+        }
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, parse_application_id, parse_client_id);
     }
