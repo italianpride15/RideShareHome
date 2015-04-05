@@ -3,15 +3,12 @@ package com.mantisclaw.italianpride15.ridesharehome;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -41,7 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 public class MainActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener, OnItemClickListener {
 
@@ -50,7 +46,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     //application objects
     private static UserModel user;
-    private BaseRideModel[] rideModels;
+    public static BaseRideModel[] rideModels;
+
+    //UI elements
     private ProgressBar progressBar;
     private TextView progressText;
 
@@ -82,74 +80,57 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         setContentView(R.layout.activity_main);
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
-        getDeviceTokenHashed();
-        //onConnect proceeds with execution
+        deviceToken = UtilityMethods.getDeviceTokenHashed(getBaseContext(), getContentResolver());
     }
 
     protected void onResume() {
         super.onResume();
-        startSpinner();
-        makeGoogleMapsRequest();
-        mGoogleApiClient.connect();
-        retrieveHomeAddress();
+        resumeApp();
     }
     //endregion
 
-    public class LoadRequestsInBackground extends AsyncTask<String, Void, Boolean> {
+    //region Address Helper Methods
+    private void resumeApp() {
+//        startSpinner();
 
-        @Override
-        protected Boolean doInBackground(String... params) {
+        Boolean hasAddress = UtilityMethods.retrieveDestinationAddress(getContext(), getUser());
+        setupAutoCompleteView();
 
-            //get last location
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-            if (mLastLocation != null) {
-                getUser().currentLatitude = String.valueOf(mLastLocation.getLatitude());
-                getUser().currentLongitude = String.valueOf(mLastLocation.getLongitude());
-            }
-
-            //get current city from location and check if service is available in user's area
-            Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
-            List<Address> addresses;
-            List<Address> homeAddress;
-            if (mLastLocation == null) {
-                toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
-                updateViewWithData();
-            } else if (getUser().homeAddress != null) {
-                try {
-                    addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                    homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
-                    if (addresses.size() > 0 && homeAddress.size() > 0) {
-                        getUser().currentCity = addresses.get(0).getLocality();
-                        getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
-                        getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
-
-                        //track analytics
-                        Map<String, String> dictionary = new HashMap<>();
-                        dictionary.put("Locality", getUser().currentCity);
-                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
-
-                        proceedIfServiceIsAvailable(getUser().currentCity);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    updateViewWithData();
-                }
-            }
-            return true;
+        if (hasAddress == true) {
+            makeGoogleMapsRequest();
+            mGoogleApiClient.connect();
+        } else {
+//            endSpinner();
+            UtilityMethods.toastMessage("Enter Address", "Please enter an address to continue.", this);
+            updateViewWithMessage("");
         }
     }
+
+    //endregion
 
     //region Location Callbacks
     @Override
     public void onConnected(Bundle connectionHint) {
-        new LoadRequestsInBackground().execute();
+
+        Boolean completedWithoutErrors;
+        completedWithoutErrors = retrieveCurrentLocation();
+
+        if (completedWithoutErrors == false) {
+            UtilityMethods.toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.", this);
+        } else {
+            proceedIfServiceIsAvailable();
+
+        }
     }
 
     public void onConnectionSuspended(int i) {}
 
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.");
+        UtilityMethods.toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.", this);
+    }
+
+    private void makeGoogleMapsRequest() {
+        buildGoogleApiClient();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -161,9 +142,254 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     }
     //endregion
 
-    //region Touch Events
-    /* Image Button onClick call to deeplink to specific apps */
+    //region Helper Methods
+    private Boolean retrieveCurrentLocation() {
+        //get last location
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            getUser().currentLatitude = String.valueOf(mLastLocation.getLatitude());
+            getUser().currentLongitude = String.valueOf(mLastLocation.getLongitude());
+        }
 
+        //get current city from location and check if service is available in user's area
+        Geocoder gcd = new Geocoder(getContext(), Locale.getDefault());
+        List<Address> addresses;
+        List<Address> homeAddress;
+        if (mLastLocation == null) {
+            return false;
+        } else if (getUser().homeAddress != null) {
+            try {
+                addresses = gcd.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                homeAddress = gcd.getFromLocationName(getUser().homeAddress, 1);
+                if (addresses.size() > 0 && homeAddress.size() > 0) {
+                    getUser().currentCity = addresses.get(0).getLocality();
+                    getUser().homeLatitude = String.valueOf(addresses.get(0).getLatitude());
+                    getUser().homeLongitude = String.valueOf(addresses.get(0).getLongitude());
+
+                    //track analytics
+                    Map<String, String> dictionary = new HashMap<>();
+                    dictionary.put("Locality", getUser().currentCity);
+                    PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.LOCATION, dictionary);
+                }
+            } catch (IOException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void proceedIfServiceIsAvailable() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("CityRate");
+        query.whereEqualTo("City", getUser().currentCity);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> rideShareList, ParseException e) {
+                if (e == null) {
+                    if (rideShareList.size() > 0) {
+
+                        //track analytics
+                        Map<String, String> dictionary = new HashMap<>();
+                        dictionary.put("NumberOfServices", Integer.toString(rideShareList.size()));
+                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
+
+                        ServiceAvailability services = new ServiceAvailability(rideShareList);
+                        getPricesFromAvailableServices(services);
+                    } else {
+                        //track analytics
+                        Map<String, String> dictionary = new HashMap<>();
+                        dictionary.put("LocationUnavailable", getUser().currentCity);
+                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
+                        UtilityMethods.toastMessage("Services Not Available", "Sorry, your devices shows you are currently in " +
+                                getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + " soon.", MainActivity.this);
+                        updateViewWithMessage("Privy is not available in " + getUser().currentCity + ".");
+                    }
+                } else {
+                    UtilityMethods.toastMessage("Network Error", "Could not retrieve available services.", MainActivity.this);
+                    updateViewWithMessage("Please check network and retry.");
+                }
+            }
+        });
+    }
+
+    private Boolean getPricesFromAvailableServices(ServiceAvailability services) {
+
+        MainActivity.rideModels = new BaseRideModel[services.numberOfAvailableServices];
+        GoogleDirectionsAPI info = new GoogleDirectionsAPI(getUser());
+
+        Integer index = 0;
+        ParseObject object;
+
+        Map<String, String> dictionary = new HashMap<>();
+
+        object = services.rideShareDictionary.get("Uber");
+        if (object != null) {
+            UberRideModel uber = new UberRideModel(getUser());
+            APIManager.makeAPICall(uber, object, info);
+            MainActivity.rideModels[index] = uber;
+            index++;
+
+            //track analytics
+            dictionary.clear();
+            dictionary.put("ServiceAvailable", "Uber");
+            dictionary.put("ServiceCost", uber.estimatedCost);
+            dictionary.put("ServiceSurge", uber.surgeRate);
+            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
+        }
+
+        object = services.rideShareDictionary.get("Lyft");
+        if (object != null) {
+            LyftRideModel lyft = new LyftRideModel(getUser());
+            APIManager.makeAPICall(lyft, object, info);
+            MainActivity.rideModels[index] = lyft;
+            index++;
+
+            //track analytics
+            dictionary.clear();
+            dictionary.put("ServiceAvailable", "Lyft");
+            dictionary.put("ServiceCost", lyft.estimatedCost);
+            dictionary.put("ServiceSurge", lyft.surgeRate);
+            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
+        }
+
+        object = services.rideShareDictionary.get("Sidecar");
+        if (object != null) {
+            SidecarRideModel sidecar = new SidecarRideModel(getUser());
+            APIManager.makeAPICall(sidecar, object, info);
+            MainActivity.rideModels[index] = sidecar;
+            index++;
+
+            //track analytics
+            dictionary.clear();
+            dictionary.put("ServiceAvailable", "Sidecar");
+            dictionary.put("ServiceCost", sidecar.estimatedCost);
+            dictionary.put("ServiceSurge", sidecar.surgeRate);
+            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
+        }
+
+        object = services.rideShareDictionary.get("Taxi");
+        if (object != null) {
+            TaxiRideModel taxi = new TaxiRideModel(getUser());
+            APIManager.makeAPICall(taxi, object, info);
+            MainActivity.rideModels[index] = taxi;
+
+            //track analytics
+            dictionary.clear();
+            dictionary.put("ServiceAvailable", "Taxi");
+            dictionary.put("ServiceCost", taxi.estimatedCost);
+            dictionary.put("ServiceSurge", taxi.surgeRate);
+            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
+        }
+
+        sortArrayByCostAndInstalled();
+        updateViewWithData();
+        return true;
+    }
+
+    private void sortArrayByCostAndInstalled() {
+
+        PackageManager pm = getContext().getPackageManager();
+
+        //check if apps are installed
+        for (BaseRideModel model : rideModels) {
+            if (model.getClass() != TaxiRideModel.class) {
+                try {
+                    pm.getPackageInfo(model.deepLinkAppName, PackageManager.GET_ACTIVITIES);
+                    model.isInstalled = true;
+                } catch (Exception e) {
+                    model.isInstalled = false;
+                }
+            } else {
+                //since we don't have a taxi app, assumed installed to not discourage use
+                model.isInstalled = true;
+            }
+        }
+
+        Arrays.sort(rideModels);
+    }
+    //endregion
+
+    //region UI
+    private void setupAutoCompleteView() {
+        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
+        autoCompView.setAdapter(new PlacesAutoCompleteAdapter(getContext(), R.layout.list_item, getUser()));
+        autoCompView.setOnItemClickListener(this);
+
+        //update home address
+        if (getUser().homeAddress != null) {
+            autoCompView.setText(getUser().homeAddress);
+        }
+    }
+    private void updateViewWithData() {
+        if (rideModels != null) {
+
+            ImageButton cheapestServiceImage = (ImageButton) findViewById(R.id.rideShareImageButton);
+            TextView cheapestServiceCost = (TextView) findViewById(R.id.rideShareTextViewCost);
+            TextView cheapestServiceSurge = (TextView) findViewById(R.id.rideShareTextViewSurge);
+
+            int id = getResources().getIdentifier(rideModels[0].drawableImageResource, "drawable", getContext().getPackageName());
+            cheapestServiceImage.setImageResource(id);
+            cheapestServiceCost.setText("Estimate Cost: $" + rideModels[0].estimatedCost);
+            if (rideModels[0].surgeRate != null) {
+                cheapestServiceSurge.setText("Surge Rate: " + rideModels[0].surgeRate);
+            } else {
+                cheapestServiceSurge.setText("Surge Rate: n/a");
+            }
+
+            RideServicesAdapter adapter = new RideServicesAdapter(rideModels);
+            ListView serviceList = (ListView) findViewById(R.id.rideShareListView);
+            serviceList.setAdapter(adapter);
+            serviceList.setOnItemClickListener(new OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position,
+                                        long id) {
+                    deepLinkToApp(position+1);
+                }
+            });
+        }
+
+//        autoCompView.clearFocus();
+    }
+
+    private void updateViewWithMessage(String message) {
+
+    }
+
+    private void startSpinner() {
+        RelativeLayout layout = new RelativeLayout(this);
+        progressBar = new ProgressBar(MainActivity.this, null, android.R.attr.progressBarStyleLarge);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setId(1);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        layout.addView(progressBar, params);
+
+        progressText = new TextView(MainActivity.this, null);
+        progressText.setText("Calculating prices...");
+        progressText.setTextSize(18);
+        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 80);
+        textParams.setMargins(0, 0, 0, 30);
+        textParams.addRule(RelativeLayout.ABOVE, progressBar.getId());
+        textParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        layout.addView(progressText, textParams);
+
+        setContentView(layout);
+    }
+
+    private void endSpinner() {
+        RelativeLayout layout = new RelativeLayout(this);
+        layout.removeView(progressBar);
+        layout.removeView(progressText);
+        progressBar = null;
+        progressText = null;
+        setContentView(R.layout.activity_main);
+    }
+    //endregion
+
+    //region Touch Events
+
+    /* Image Button onClick call to deeplink to specific apps */
     public void deepLinkToApp(View view) {
         deepLinkToApp(0);
     }
@@ -213,294 +439,22 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
                     // App not installed! Launch popup.
                     if (!rideModels[index].serviceName.equals("Taxi")) {
-                        toastMessage("App Not Installed", "Please install the " + rideModels[index].serviceName + " app.");
+                        UtilityMethods.toastMessage("App Not Installed", "Please install the " + rideModels[index].serviceName + " app.", this);
                     }
                 }
             }
         }
     }
-    //endregion
 
-    //region Helper Methods
-    private void makeGoogleMapsRequest() {
-        buildGoogleApiClient();
-    }
-
-    private void retrieveHomeAddress() {
-
-        SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", MODE_PRIVATE);
-        getUser().homeAddress = preferences.getString("homeAddress", null);
-
-        if (getUser().homeAddress == null) {
-
-            //track analytics
-            Map<String, String> dictionary = new HashMap<>();
-            dictionary.put("NoAddress", "true");
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
-
-            toastMessage("Enter Address", "Please enter an address to continue.");
-        } else {
-            //track analytics
-            Map<String, String> dictionary = new HashMap<>();
-            dictionary.put("AddressRetrieved", "true");
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
-        }
-    }
-
-    private void storeHomeAddress() {
-        if (getUser().homeAddress != null) {
-            SharedPreferences preferences = getContext().getSharedPreferences("RideShareHomePreferences", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("homeAddress", getUser().homeAddress);
-            editor.putString("homeLatitude", getUser().homeLatitude);
-            editor.putString("homeLongitude", getUser().homeLongitude);
-            editor.commit();
-
-            //track analytics
-            Map<String, String> dictionary = new HashMap<>();
-            dictionary.put("AddressStored", "true");
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.USER, dictionary);
-        }
-        mGoogleApiClient.reconnect();
-    }
-
-    private void proceedIfServiceIsAvailable(final String currentCity) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("CityRate");
-        query.whereEqualTo("City", getUser().currentCity);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> rideShareList, ParseException e) {
-                if (e == null) {
-                    if (rideShareList.size() > 0) {
-
-                        //track analytics
-                        Map<String, String> dictionary = new HashMap<>();
-                        dictionary.put("NumberOfServices", Integer.toString(rideShareList.size()));
-                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
-
-                        ServiceAvailability services = new ServiceAvailability(rideShareList);
-                        getPricesFromAvailableServices(services);
-                    } else {
-                        //track analytics
-                        Map<String, String> dictionary = new HashMap<>();
-                        dictionary.put("LocationUnavailable", getUser().currentCity);
-                        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
-                        toastMessage("Services Not Available", "Sorry, your devices shows you are currently in " +
-                                getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + " soon.");
-                    }
-                } else {
-                    toastMessage("Network Error", "Could not retrieve available services.");
-                }
-            }
-        });
-    }
-
-    private void getPricesFromAvailableServices(ServiceAvailability services) {
-
-        rideModels = new BaseRideModel[services.numberOfAvailableServices];
-        GoogleDirectionsAPI info = new GoogleDirectionsAPI(getUser());
-
-        Integer index = 0;
-        ParseObject object;
-
-        Map<String, String> dictionary = new HashMap<>();
-
-        object = services.rideShareDictionary.get("Uber");
-        if (object != null) {
-            UberRideModel uber = new UberRideModel(getUser());
-            APIManager.makeAPICall(uber, object, info);
-            rideModels[index] = uber;
-            index++;
-
-            //track analytics
-            dictionary.clear();
-            dictionary.put("ServiceAvailable", "Uber");
-            dictionary.put("ServiceCost", uber.estimatedCost);
-            dictionary.put("ServiceSurge", uber.surgeRate);
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
-        }
-
-        object = services.rideShareDictionary.get("Lyft");
-        if (object != null) {
-            LyftRideModel lyft = new LyftRideModel(getUser());
-            APIManager.makeAPICall(lyft, object, info);
-            rideModels[index] = lyft;
-            index++;
-
-            //track analytics
-            dictionary.clear();
-            dictionary.put("ServiceAvailable", "Lyft");
-            dictionary.put("ServiceCost", lyft.estimatedCost);
-            dictionary.put("ServiceSurge", lyft.surgeRate);
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
-        }
-
-        object = services.rideShareDictionary.get("Sidecar");
-        if (object != null) {
-            SidecarRideModel sidecar = new SidecarRideModel(getUser());
-            APIManager.makeAPICall(sidecar, object, info);
-            rideModels[index] = sidecar;
-            index++;
-
-            //track analytics
-            dictionary.clear();
-            dictionary.put("ServiceAvailable", "Sidecar");
-            dictionary.put("ServiceCost", sidecar.estimatedCost);
-            dictionary.put("ServiceSurge", sidecar.surgeRate);
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
-        }
-
-        object = services.rideShareDictionary.get("Taxi");
-        if (object != null) {
-            TaxiRideModel taxi = new TaxiRideModel(getUser());
-            APIManager.makeAPICall(taxi, object, info);
-            rideModels[index] = taxi;
-
-            //track analytics
-            dictionary.clear();
-            dictionary.put("ServiceAvailable", "Taxi");
-            dictionary.put("ServiceCost", taxi.estimatedCost);
-            dictionary.put("ServiceSurge", taxi.surgeRate);
-            PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.SERVICES, dictionary);
-        }
-
-        sortArrayByCostAndInstalled();
-        updateViewWithData();
-    }
-
-    private void sortArrayByCostAndInstalled() {
-
-        PackageManager pm = getContext().getPackageManager();
-
-        //check if apps are installed
-        for (BaseRideModel model : rideModels) {
-            if (model.getClass() != TaxiRideModel.class) {
-                try {
-                    pm.getPackageInfo(model.deepLinkAppName, PackageManager.GET_ACTIVITIES);
-                    model.isInstalled = true;
-                } catch (Exception e) {
-                    model.isInstalled = false;
-                }
-            } else {
-                //since we don't have a taxi app, assumed installed to not discourage use
-                model.isInstalled = true;
-            }
-        }
-
-        Arrays.sort(rideModels);
-    }
-
-    private void updateViewWithData() {
-        endSpinner();
-
-        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
-        autoCompView.setAdapter(new PlacesAutoCompleteAdapter(getContext(), R.layout.list_item, getUser()));
-        autoCompView.setOnItemClickListener(this);
-
-        //update home address
-        autoCompView.setText(getUser().homeAddress);
-
-        if (rideModels != null) {
-
-            ImageButton cheapestServiceImage = (ImageButton) findViewById(R.id.rideShareImageButton);
-            TextView cheapestServiceCost = (TextView) findViewById(R.id.rideShareTextViewCost);
-            TextView cheapestServiceSurge = (TextView) findViewById(R.id.rideShareTextViewSurge);
-
-            int id = getResources().getIdentifier(rideModels[0].drawableImageResource, "drawable", getContext().getPackageName());
-            cheapestServiceImage.setImageResource(id);
-            cheapestServiceCost.setText("Estimate Cost: $" + rideModels[0].estimatedCost);
-            if (rideModels[0].surgeRate != null) {
-                cheapestServiceSurge.setText("Surge Rate: " + rideModels[0].surgeRate);
-            } else {
-                cheapestServiceSurge.setText("Surge Rate: n/a");
-            }
-
-            RideServicesAdapter adapter = new RideServicesAdapter(rideModels);
-            ListView serviceList = (ListView) findViewById(R.id.rideShareListView);
-            serviceList.setAdapter(adapter);
-            serviceList.setOnItemClickListener(new OnItemClickListener() {
-
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position,
-                                        long id) {
-                    deepLinkToApp(position+1);
-                }
-            });
-        }
-
-        autoCompView.clearFocus();
-    }
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         String newAddress = (String) adapterView.getItemAtPosition(position);
         Toast.makeText(this, newAddress, Toast.LENGTH_SHORT).show();
-        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(autoCompView.getWindowToken(), 0);
-        autoCompView.clearFocus();
+//        imm.hideSoftInputFromWindow(autoCompView.getWindowToken(), 0);
+//        autoCompView.clearFocus();
         getUser().homeAddress = newAddress;
-        storeHomeAddress();
-    }
-
-    /*
-        Get hashed version of deviceUUID so we have unique reference for user without having
-        their phone's private information
-     */
-    private void getDeviceTokenHashed() {
-        final TelephonyManager telephonyManager = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-
-        final String tmDevice, tmSerial, androidId;
-        tmDevice = "" + telephonyManager.getDeviceId();
-        tmSerial = "" + telephonyManager.getSimSerialNumber();
-        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
-        UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
-        deviceToken = deviceUuid.toString().substring(deviceUuid.toString().length()-12, deviceUuid.toString().length());
-    }
-
-    private void toastMessage(String title, String message) {
-
-        //track analytics
-        Map<String, String> dictionary = new HashMap<>();
-        dictionary.put(title, message);
-        PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.ALERTS, dictionary);
-
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-        if (!title.equals("App Not Installed")) {
-            updateViewWithData();
-        }
-    }
-    //endregion
-
-    //region Spinner
-    private void startSpinner() {
-        RelativeLayout layout = new RelativeLayout(this);
-        progressBar = new ProgressBar(MainActivity.this, null, android.R.attr.progressBarStyleLarge);
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setId(1);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        layout.addView(progressBar, params);
-
-        progressText = new TextView(MainActivity.this, null);
-        progressText.setText("Calculating prices...");
-        progressText.setTextSize(18);
-        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 80);
-        textParams.setMargins(0, 0, 0, 30);
-        textParams.addRule(RelativeLayout.ABOVE, progressBar.getId());
-        textParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(progressText, textParams);
-
-        setContentView(layout);
-    }
-
-    private void endSpinner() {
-        RelativeLayout layout = new RelativeLayout(this);
-        layout.removeView(progressBar);
-        layout.removeView(progressText);
-        progressBar = null;
-        progressText = null;
-        setContentView(R.layout.activity_main);
+//        autoCompView.setText(newAddress);
+        UtilityMethods.storeDestinationAddress(getContext(), getUser());
     }
     //endregion
 
