@@ -6,5 +6,6 @@
     android:gravity="center"
     android:paddingLeft="10dp"
     android:textAppearance="?android:attr/textAppearanceMedium"
+    android:textColor="#7e7e7e"
     android:layout_centerVertical="true"
     />

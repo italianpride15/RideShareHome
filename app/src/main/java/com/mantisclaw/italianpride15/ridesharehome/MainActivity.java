@@ -16,8 +16,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,10 +45,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
     //application objects
     private static UserModel user;
     public static BaseRideModel[] rideModels;
-
-    //UI elements
-    private ProgressBar progressBar;
-    private TextView progressText;
 
     //location
     public static Context context;
@@ -91,7 +85,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     //region Address Helper Methods
     private void resumeApp() {
-//        startSpinner();
 
         Boolean hasAddress = UtilityMethods.retrieveDestinationAddress(getContext(), getUser());
         setupAutoCompleteView();
@@ -100,9 +93,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             makeGoogleMapsRequest();
             mGoogleApiClient.connect();
         } else {
-//            endSpinner();
             UtilityMethods.toastMessage("Enter Address", "Please enter an address to continue.", this);
-            updateViewWithMessage("");
         }
     }
 
@@ -119,7 +110,6 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
             UtilityMethods.toastMessage("Network Error", "Could not retrieve location. Please check connection and relaunch app.", this);
         } else {
             proceedIfServiceIsAvailable();
-
         }
     }
 
@@ -201,11 +191,9 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.STATS, dictionary);
                         UtilityMethods.toastMessage("Services Not Available", "Sorry, your devices shows you are currently in " +
                                 getUser().currentCity + ". We hope to add availability in " + getUser().currentCity + " soon.", MainActivity.this);
-                        updateViewWithMessage("Privy is not available in " + getUser().currentCity + ".");
                     }
                 } else {
                     UtilityMethods.toastMessage("Network Error", "Could not retrieve available services.", MainActivity.this);
-                    updateViewWithMessage("Please check network and retry.");
                 }
             }
         });
@@ -347,45 +335,7 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
                 }
             });
         }
-
-//        autoCompView.clearFocus();
     }
-
-    private void updateViewWithMessage(String message) {
-
-    }
-
-    private void startSpinner() {
-        RelativeLayout layout = new RelativeLayout(this);
-        progressBar = new ProgressBar(MainActivity.this, null, android.R.attr.progressBarStyleLarge);
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.VISIBLE);
-        progressBar.setId(1);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        layout.addView(progressBar, params);
-
-        progressText = new TextView(MainActivity.this, null);
-        progressText.setText("Calculating prices...");
-        progressText.setTextSize(18);
-        RelativeLayout.LayoutParams textParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, 80);
-        textParams.setMargins(0, 0, 0, 30);
-        textParams.addRule(RelativeLayout.ABOVE, progressBar.getId());
-        textParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        layout.addView(progressText, textParams);
-
-        setContentView(layout);
-    }
-
-    private void endSpinner() {
-        RelativeLayout layout = new RelativeLayout(this);
-        layout.removeView(progressBar);
-        layout.removeView(progressText);
-        progressBar = null;
-        progressText = null;
-        setContentView(R.layout.activity_main);
-    }
-    //endregion
 
     //region Touch Events
 
@@ -448,13 +398,14 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
 
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         String newAddress = (String) adapterView.getItemAtPosition(position);
+        AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.HomeAddress);
         Toast.makeText(this, newAddress, Toast.LENGTH_SHORT).show();
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.hideSoftInputFromWindow(autoCompView.getWindowToken(), 0);
-//        autoCompView.clearFocus();
+        imm.hideSoftInputFromWindow(autoCompView.getWindowToken(), 0);
+        autoCompView.clearFocus();
         getUser().homeAddress = newAddress;
-//        autoCompView.setText(newAddress);
         UtilityMethods.storeDestinationAddress(getContext(), getUser());
+        mGoogleApiClient.reconnect();
     }
     //endregion
 

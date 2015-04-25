@@ -61,7 +61,7 @@ public class UtilityMethods {
         dictionary.put(title, message);
         PFAnalytics.trackEvent(PFAnalytics.AnalyticsCategory.ALERTS, dictionary);
 
-        Toast.makeText(activity, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
     }
 
     /*
