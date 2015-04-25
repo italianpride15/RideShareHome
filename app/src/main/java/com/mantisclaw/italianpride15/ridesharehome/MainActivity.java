@@ -405,7 +405,8 @@ public class MainActivity extends Activity implements ConnectionCallbacks, OnCon
         autoCompView.clearFocus();
         getUser().homeAddress = newAddress;
         UtilityMethods.storeDestinationAddress(getContext(), getUser());
-        mGoogleApiClient.reconnect();
+        makeGoogleMapsRequest();
+        mGoogleApiClient.connect();
     }
     //endregion
 
