@@ -16,8 +16,8 @@ public class TaxiRideModel extends BaseRideModel {
         urlString.append(taxiFareFinder_base_url);
         urlString.append("key=");
         urlString.append(taxiFareFinder_client_id);
-        urlString.append("&entity_handle=");
-        urlString.append(user.currentCity);
+//        urlString.append("&entity_handle=");
+//        urlString.append(user.currentCity);
         urlString.append("&origin=");
         urlString.append(user.currentLatitude + "," + user.currentLongitude);
         urlString.append("&destination=");
